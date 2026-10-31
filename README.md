@@ -3,6 +3,35 @@
 <p align="center"><img src="other/QIDI.png" height="240" alt="QIDI's logo" /></p>
 <p align="center"><a href="/LICENSE"><img alt="GPL-V3.0 License" src="other/qidi.svg"></a></p>
 
+# About this fork
+
+Personal fork of [QIDITECH/QIDI_PLUS4](https://github.com/QIDITECH/QIDI_PLUS4) for running a Plus4 with a single external spool and no QIDI Box.
+
+- `main` tracks upstream. Changes live on the `single-spool` branch.
+- `config/` on `single-spool` starts from the configuration the printer runs after the online update past V1.7.1.
+
+## Single-spool changes
+
+- `config/saved_variables.cfg.bak`: default values for `saved_variables.cfg`, which is the file Klipper reads. Changes here only apply after copying it over `saved_variables.cfg` on the printer.
+  - `enable_box = 0`: keeps Box logic off in the print, pause and resume macros, even if a Box is detected. With `box_count = 0` that logic is already skipped.
+  - `auto_reload_detect = 0`: on runout the printer pauses instead of calling `AUTO_RELOAD_FILAMENT`, a Box macro that is not defined without the Box config.
+- `config/gcode_macro.cfg`: `LOAD_FILAMENT` and `UNLOAD_FILAMENT` macros. They call the stock `M604` (load) and `M603` (cut, then purge what is left in the nozzle; pull the spool back afterwards), without the Box or filament-sensor checks of the touchscreen. Fluidd shows them as Load/Unload buttons on the toolhead card.
+  - `TEMP` (default `250`, same as stock) must be within the extruder's `min_extrude_temp` and `max_temp`.
+  - Both refuse to run while printing. Pause the print first.
+
+The touchscreen keeps the Box loading screen. That UI is driven by QIDI's closed-source screen application, which is not part of this repository.
+
+To switch Box logic off on a running printer without copying files, run `SAVE_VARIABLE VARIABLE=enable_box VALUE=0` from the Fluidd console. Use `VALUE=1` to switch it back on.
+
+## Keeping up with upstream
+
+```bash
+git remote add upstream https://github.com/QIDITECH/QIDI_PLUS4.git
+git fetch upstream
+git switch main && git merge --ff-only upstream/main && git push origin main
+git switch single-spool && git rebase main
+```
+
 # Documentation Guidelines
 
 QIDI PLUS4 is a 3D printer that uses Klipper as its foundation. This repository is used for updates and releases for the PLUS4 model, as well as for issue tracking.
