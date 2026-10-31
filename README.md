@@ -23,7 +23,7 @@ The touchscreen keeps the Box loading screen. That UI is driven by QIDI's closed
 
 To switch Box logic off on a running printer without copying files, run `SAVE_VARIABLE VARIABLE=enable_box VALUE=0` from the Fluidd console. Use `VALUE=1` to switch it back on.
 
-To get the single-spool touchscreen back, reflash the eMMC and install V1.6.0: see [docs/emmc-reflash-to-v1.6.0.md](docs/emmc-reflash-to-v1.6.0.md).
+To get the single-spool touchscreen back, reflash the eMMC and install V1.6.0: see [docs/emmc-reflash-v1.6.0.md](docs/emmc-reflash-v1.6.0.md).
 
 ## Keeping up with upstream
 
