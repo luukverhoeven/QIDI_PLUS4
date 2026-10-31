@@ -15,7 +15,7 @@ Personal fork of [QIDITECH/QIDI_PLUS4](https://github.com/QIDITECH/QIDI_PLUS4) f
 - `config/saved_variables.cfg.bak`: default values for `saved_variables.cfg`, which is the file Klipper reads. Changes here only apply after copying it over `saved_variables.cfg` on the printer.
   - `enable_box = 0`: keeps Box logic off in the print, pause and resume macros, even if a Box is detected. With `box_count = 0` that logic is already skipped.
   - `auto_reload_detect = 0`: on runout the printer pauses instead of calling `AUTO_RELOAD_FILAMENT`, a Box macro that is not defined without the Box config.
-- `config/gcode_macro.cfg`: `LOAD_FILAMENT` and `UNLOAD_FILAMENT` macros. They call the stock `M604` (load) and `M603` (cut, then purge what is left in the nozzle; pull the spool back afterwards), without the Box or filament-sensor checks of the touchscreen. Fluidd shows them as Load/Unload buttons on the toolhead card.
+- `config/gcode_macro.cfg`: `LOAD_FILAMENT` and `UNLOAD_FILAMENT` macros. They call the stock `M604` (load) and `M603` (cut, then purge what is left in the nozzle; pull the spool back afterwards), without the Box or filament-sensor checks of the touchscreen. Fluidd shows them as buttons on the Macros card.
   - `TEMP` (default `250`, same as stock) must be within the extruder's `min_extrude_temp` and `max_temp`.
   - Both refuse to run while printing. Pause the print first.
 
