@@ -1,0 +1,16 @@
+[Unit]
+Description=Open-source touchscreen program for the QIDI Plus4 (replaces xindi)
+After=network.target moonraker.service
+Wants=moonraker.service
+
+[Service]
+Type=simple
+User=mks
+SupplementaryGroups=dialout
+WorkingDirectory=/home/mks/plus4-screen
+ExecStart=/usr/bin/python3 -m plus4screen
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

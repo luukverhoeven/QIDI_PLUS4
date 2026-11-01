@@ -19,7 +19,13 @@ Personal fork of [QIDITECH/QIDI_PLUS4](https://github.com/QIDITECH/QIDI_PLUS4) f
   - `TEMP` (default `250`, same as stock) must be within the extruder's `min_extrude_temp` and `max_temp`.
   - Both refuse to run while printing. Pause the print first.
 
-The touchscreen keeps the Box loading screen. That UI is driven by QIDI's closed-source screen application, which is not part of this repository.
+With QIDI's closed-source screen program (`xindi`), the touchscreen keeps the Box loading screen.
+
+## Open-source touchscreen program
+
+[`screen/`](screen/README.md) holds `plus4screen`, an open-source replacement for `xindi`. It drives the built-in touchscreen with QIDI's existing pages, talks to Klipper through Moonraker, and turns the control page's filament button into a single-spool load/unload flow. Nothing is flashed onto the screen; `screen/uninstall.sh` gives the screen back to `xindi`. It has not been tested on a printer yet: start with `--dry-run`.
+
+[`tools/hmi_dump.py`](tools/hmi_dump.py) reads QIDI's screen layout (`UI/xindi_800_480.HMI`) without the TJC editor. [`screen/LAYOUT.md`](screen/LAYOUT.md) is its map of every page and button.
 
 To switch Box logic off on a running printer without copying files, run `SAVE_VARIABLE VARIABLE=enable_box VALUE=0` from the Fluidd console. Use `VALUE=1` to switch it back on.
 
