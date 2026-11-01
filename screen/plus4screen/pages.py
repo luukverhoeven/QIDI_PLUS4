@@ -50,7 +50,8 @@ W_STEP = {6: 1, 7: 10, 8: 50, 9: 100}   # widget -> mm
 STEP_PICC = ((114, 116), (115, 115))     # normal, selected
 HEATER_PICC = ((114, 116), (115, 118))   # b0-b2: idle, heating
 CONTROL_ARROWS = ("b20", "b21")          # extruder arrows: (114, 116)
-CONTROL_LABELS = ("b12", "b13")          # pco white
+CONTROL_LABELS = ("b13",)                # pco white (xindi also writes b12,
+                                         # which this layout does not have)
 W_HOME = 10
 W_MOTORS_OFF = 11
 W_FILAMENT = 13          # stock: QIDI Box page; here: single-spool flow
