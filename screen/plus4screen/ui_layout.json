@@ -1,0 +1,3684 @@
+{
+ "fonts": [
+  {
+   "css": "f0",
+   "css_px": 13,
+   "family": "Inter SemiBold",
+   "id": 0,
+   "weight": 600
+  },
+  {
+   "css": "f1",
+   "css_px": 15,
+   "family": "Inter Bold",
+   "id": 1,
+   "weight": 700
+  },
+  {
+   "css": "f2",
+   "css_px": 20,
+   "family": "Inter Bold",
+   "id": 2,
+   "weight": 700
+  },
+  {
+   "css": "f3",
+   "css_px": 34,
+   "family": "Inter Bold",
+   "id": 3,
+   "weight": 700
+  },
+  {
+   "css": "f4",
+   "css_px": 72,
+   "family": "Inter ExtraBold",
+   "id": 4,
+   "weight": 800
+  }
+ ],
+ "pictures": [
+  {
+   "file": "000_boot_bg.png",
+   "id": 0,
+   "kind": "bg",
+   "screen": "boot"
+  },
+  {
+   "file": "001_home_bg.png",
+   "id": 1,
+   "kind": "bg",
+   "screen": "home"
+  },
+  {
+   "file": "002_home_pressed.png",
+   "id": 2,
+   "kind": "pressed",
+   "screen": "home"
+  },
+  {
+   "file": "003_home_on.png",
+   "id": 3,
+   "kind": "on",
+   "screen": "home"
+  },
+  {
+   "file": "004_printing_bg.png",
+   "id": 4,
+   "kind": "bg",
+   "screen": "printing"
+  },
+  {
+   "file": "005_printing_pressed.png",
+   "id": 5,
+   "kind": "pressed",
+   "screen": "printing"
+  },
+  {
+   "file": "006_printing_on.png",
+   "id": 6,
+   "kind": "on",
+   "screen": "printing"
+  },
+  {
+   "file": "007_files_bg.png",
+   "id": 7,
+   "kind": "bg",
+   "screen": "files"
+  },
+  {
+   "file": "008_files_pressed.png",
+   "id": 8,
+   "kind": "pressed",
+   "screen": "files"
+  },
+  {
+   "file": "009_files_on.png",
+   "id": 9,
+   "kind": "on",
+   "screen": "files"
+  },
+  {
+   "file": "010_preview_bg.png",
+   "id": 10,
+   "kind": "bg",
+   "screen": "preview"
+  },
+  {
+   "file": "011_preview_pressed.png",
+   "id": 11,
+   "kind": "pressed",
+   "screen": "preview"
+  },
+  {
+   "file": "012_move_bg.png",
+   "id": 12,
+   "kind": "bg",
+   "screen": "move"
+  },
+  {
+   "file": "013_move_pressed.png",
+   "id": 13,
+   "kind": "pressed",
+   "screen": "move"
+  },
+  {
+   "file": "014_move_on.png",
+   "id": 14,
+   "kind": "on",
+   "screen": "move"
+  },
+  {
+   "file": "015_filament_bg.png",
+   "id": 15,
+   "kind": "bg",
+   "screen": "filament"
+  },
+  {
+   "file": "016_filament_pressed.png",
+   "id": 16,
+   "kind": "pressed",
+   "screen": "filament"
+  },
+  {
+   "file": "017_filament_on.png",
+   "id": 17,
+   "kind": "on",
+   "screen": "filament"
+  },
+  {
+   "file": "018_temps_bg.png",
+   "id": 18,
+   "kind": "bg",
+   "screen": "temps"
+  },
+  {
+   "file": "019_temps_pressed.png",
+   "id": 19,
+   "kind": "pressed",
+   "screen": "temps"
+  },
+  {
+   "file": "020_tools_bg.png",
+   "id": 20,
+   "kind": "bg",
+   "screen": "tools"
+  },
+  {
+   "file": "021_tools_pressed.png",
+   "id": 21,
+   "kind": "pressed",
+   "screen": "tools"
+  },
+  {
+   "file": "022_tool_run_bg.png",
+   "id": 22,
+   "kind": "bg",
+   "screen": "tool_run"
+  },
+  {
+   "file": "023_tool_run_pressed.png",
+   "id": 23,
+   "kind": "pressed",
+   "screen": "tool_run"
+  },
+  {
+   "file": "024_tool_run_on.png",
+   "id": 24,
+   "kind": "on",
+   "screen": "tool_run"
+  },
+  {
+   "file": "025_settings_bg.png",
+   "id": 25,
+   "kind": "bg",
+   "screen": "settings"
+  },
+  {
+   "file": "026_settings_pressed.png",
+   "id": 26,
+   "kind": "pressed",
+   "screen": "settings"
+  },
+  {
+   "file": "027_about_bg.png",
+   "id": 27,
+   "kind": "bg",
+   "screen": "about"
+  },
+  {
+   "file": "028_about_pressed.png",
+   "id": 28,
+   "kind": "pressed",
+   "screen": "about"
+  },
+  {
+   "file": "029_keypad_bg.png",
+   "id": 29,
+   "kind": "bg",
+   "screen": "keypad"
+  },
+  {
+   "file": "030_keypad_pressed.png",
+   "id": 30,
+   "kind": "pressed",
+   "screen": "keypad"
+  },
+  {
+   "file": "031_confirm_bg.png",
+   "id": 31,
+   "kind": "bg",
+   "screen": "confirm"
+  },
+  {
+   "file": "032_confirm_pressed.png",
+   "id": 32,
+   "kind": "pressed",
+   "screen": "confirm"
+  },
+  {
+   "file": "033_message_bg.png",
+   "id": 33,
+   "kind": "bg",
+   "screen": "message"
+  },
+  {
+   "file": "034_message_pressed.png",
+   "id": 34,
+   "kind": "pressed",
+   "screen": "message"
+  }
+ ],
+ "screens": {
+  "about": {
+   "bars": [],
+   "bg": 27,
+   "dots": [],
+   "hits": [
+    {
+     "id": "nav_home",
+     "rect": [
+      8,
+      68,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_files",
+     "rect": [
+      8,
+      132,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_move",
+     "rect": [
+      8,
+      196,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_tools",
+     "rect": [
+      8,
+      260,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_settings",
+     "rect": [
+      8,
+      324,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "estop",
+     "rect": [
+      14,
+      410,
+      56,
+      56
+     ]
+    },
+    {
+     "id": "close",
+     "rect": [
+      698,
+      13,
+      86,
+      36
+     ]
+    }
+   ],
+   "pressed": 28,
+   "texts": [
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "v_screen",
+     "on": null,
+     "rect": [
+      327,
+      119,
+      420,
+      16
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "v_klipper",
+     "on": null,
+     "rect": [
+      327,
+      173,
+      420,
+      16
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "v_moonraker",
+     "on": null,
+     "rect": [
+      327,
+      227,
+      420,
+      16
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "v_mcu",
+     "on": null,
+     "rect": [
+      327,
+      281,
+      420,
+      16
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "v_mcu_th",
+     "on": null,
+     "rect": [
+      327,
+      335,
+      420,
+      16
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "v_host",
+     "on": null,
+     "rect": [
+      327,
+      389,
+      420,
+      16
+     ]
+    }
+   ],
+   "thumbs": [],
+   "toggles": []
+  },
+  "boot": {
+   "bars": [],
+   "bg": 0,
+   "dots": [],
+   "hits": [],
+   "texts": [
+    {
+     "align": "center",
+     "color": 38166,
+     "font": 0,
+     "id": "boot_msg",
+     "on": null,
+     "rect": [
+      200,
+      315,
+      400,
+      18
+     ]
+    }
+   ],
+   "thumbs": [],
+   "toggles": []
+  },
+  "confirm": {
+   "bars": [],
+   "bg": 31,
+   "dots": [],
+   "hits": [
+    {
+     "id": "no",
+     "rect": [
+      195,
+      293,
+      199,
+      52
+     ]
+    },
+    {
+     "id": "yes",
+     "rect": [
+      406,
+      293,
+      199,
+      52
+     ]
+    }
+   ],
+   "pressed": 32,
+   "texts": [
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 2,
+     "id": "title",
+     "on": null,
+     "rect": [
+      247,
+      142,
+      340,
+      26
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "body1",
+     "on": null,
+     "rect": [
+      195,
+      193,
+      410,
+      18
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "body2",
+     "on": null,
+     "rect": [
+      195,
+      215,
+      410,
+      18
+     ]
+    },
+    {
+     "align": "center",
+     "color": 259,
+     "font": 1,
+     "id": "yes",
+     "on": null,
+     "rect": [
+      416,
+      309,
+      180,
+      20
+     ]
+    }
+   ],
+   "thumbs": [],
+   "toggles": []
+  },
+  "filament": {
+   "bars": [
+    {
+     "fill": 65535,
+     "id": "heat",
+     "rect": [
+      121,
+      310,
+      150,
+      6
+     ],
+     "track": 8551
+    }
+   ],
+   "bg": 15,
+   "dots": [],
+   "hits": [
+    {
+     "id": "nav_home",
+     "rect": [
+      8,
+      68,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_files",
+     "rect": [
+      8,
+      132,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_move",
+     "rect": [
+      8,
+      196,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_tools",
+     "rect": [
+      8,
+      260,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_settings",
+     "rect": [
+      8,
+      324,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "estop",
+     "rect": [
+      14,
+      410,
+      56,
+      56
+     ]
+    },
+    {
+     "id": "close",
+     "rect": [
+      692,
+      13,
+      92,
+      36
+     ]
+    },
+    {
+     "id": "mat_pla",
+     "rect": [
+      100,
+      116,
+      129,
+      74
+     ]
+    },
+    {
+     "id": "mat_petg",
+     "rect": [
+      239,
+      116,
+      129,
+      74
+     ]
+    },
+    {
+     "id": "mat_abs",
+     "rect": [
+      378,
+      116,
+      129,
+      74
+     ]
+    },
+    {
+     "id": "mat_pa",
+     "rect": [
+      516,
+      116,
+      129,
+      74
+     ]
+    },
+    {
+     "id": "mat_custom",
+     "rect": [
+      655,
+      116,
+      129,
+      74
+     ]
+    },
+    {
+     "id": "unload",
+     "rect": [
+      100,
+      364,
+      336,
+      60
+     ]
+    },
+    {
+     "id": "load",
+     "rect": [
+      448,
+      364,
+      336,
+      60
+     ]
+    }
+   ],
+   "on": 17,
+   "pressed": 16,
+   "texts": [
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "hint",
+     "on": null,
+     "rect": [
+      100,
+      37,
+      340,
+      17
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "custom",
+     "on": "mat_custom",
+     "rect": [
+      668,
+      152,
+      90,
+      16
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 3,
+     "id": "temp",
+     "on": null,
+     "rect": [
+      121,
+      238,
+      150,
+      42
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "target",
+     "on": null,
+     "rect": [
+      121,
+      282,
+      150,
+      16
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 1,
+     "id": "status",
+     "on": null,
+     "rect": [
+      293,
+      244,
+      470,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "detail1",
+     "on": null,
+     "rect": [
+      293,
+      272,
+      470,
+      18
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "detail2",
+     "on": null,
+     "rect": [
+      293,
+      292,
+      470,
+      18
+     ]
+    }
+   ],
+   "thumbs": [],
+   "toggles": [
+    {
+     "id": "stage1",
+     "rect": [
+      100,
+      71,
+      66,
+      26
+     ]
+    },
+    {
+     "id": "stage2",
+     "rect": [
+      400,
+      71,
+      82,
+      26
+     ]
+    },
+    {
+     "id": "stage3",
+     "rect": [
+      716,
+      71,
+      68,
+      26
+     ]
+    },
+    {
+     "id": "mat_pla",
+     "rect": [
+      100,
+      116,
+      129,
+      74
+     ]
+    },
+    {
+     "id": "mat_petg",
+     "rect": [
+      239,
+      116,
+      129,
+      74
+     ]
+    },
+    {
+     "id": "mat_abs",
+     "rect": [
+      378,
+      116,
+      129,
+      74
+     ]
+    },
+    {
+     "id": "mat_pa",
+     "rect": [
+      516,
+      116,
+      129,
+      74
+     ]
+    },
+    {
+     "id": "mat_custom",
+     "rect": [
+      655,
+      116,
+      129,
+      74
+     ]
+    }
+   ]
+  },
+  "files": {
+   "bars": [],
+   "bg": 7,
+   "dots": [],
+   "hits": [
+    {
+     "id": "nav_home",
+     "rect": [
+      8,
+      68,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_files",
+     "rect": [
+      8,
+      132,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_move",
+     "rect": [
+      8,
+      196,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_tools",
+     "rect": [
+      8,
+      260,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_settings",
+     "rect": [
+      8,
+      324,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "estop",
+     "rect": [
+      14,
+      410,
+      56,
+      56
+     ]
+    },
+    {
+     "id": "tab_local",
+     "rect": [
+      656,
+      13,
+      65,
+      36
+     ]
+    },
+    {
+     "id": "tab_usb",
+     "rect": [
+      723,
+      13,
+      57,
+      36
+     ]
+    },
+    {
+     "id": "file0",
+     "rect": [
+      100,
+      62,
+      220,
+      168
+     ]
+    },
+    {
+     "id": "file1",
+     "rect": [
+      332,
+      62,
+      220,
+      168
+     ]
+    },
+    {
+     "id": "file2",
+     "rect": [
+      564,
+      62,
+      220,
+      168
+     ]
+    },
+    {
+     "id": "file3",
+     "rect": [
+      100,
+      242,
+      220,
+      168
+     ]
+    },
+    {
+     "id": "file4",
+     "rect": [
+      332,
+      242,
+      220,
+      168
+     ]
+    },
+    {
+     "id": "file5",
+     "rect": [
+      564,
+      242,
+      220,
+      168
+     ]
+    },
+    {
+     "id": "prev",
+     "rect": [
+      100,
+      422,
+      120,
+      52
+     ]
+    },
+    {
+     "id": "next",
+     "rect": [
+      664,
+      422,
+      120,
+      52
+     ]
+    }
+   ],
+   "on": 9,
+   "pressed": 8,
+   "texts": [
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "summary",
+     "on": null,
+     "rect": [
+      100,
+      37,
+      340,
+      17
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 1,
+     "id": "name0",
+     "on": null,
+     "rect": [
+      111,
+      177,
+      198,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "meta0",
+     "on": null,
+     "rect": [
+      111,
+      199,
+      198,
+      16
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 1,
+     "id": "name1",
+     "on": null,
+     "rect": [
+      343,
+      177,
+      198,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "meta1",
+     "on": null,
+     "rect": [
+      343,
+      199,
+      198,
+      16
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 1,
+     "id": "name2",
+     "on": null,
+     "rect": [
+      575,
+      177,
+      198,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "meta2",
+     "on": null,
+     "rect": [
+      575,
+      199,
+      198,
+      16
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 1,
+     "id": "name3",
+     "on": null,
+     "rect": [
+      111,
+      357,
+      198,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "meta3",
+     "on": null,
+     "rect": [
+      111,
+      379,
+      198,
+      16
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 1,
+     "id": "name4",
+     "on": null,
+     "rect": [
+      343,
+      357,
+      198,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "meta4",
+     "on": null,
+     "rect": [
+      343,
+      379,
+      198,
+      16
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 1,
+     "id": "name5",
+     "on": null,
+     "rect": [
+      575,
+      357,
+      198,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "meta5",
+     "on": null,
+     "rect": [
+      575,
+      379,
+      198,
+      16
+     ]
+    },
+    {
+     "align": "center",
+     "color": 38166,
+     "font": 0,
+     "id": "page",
+     "on": null,
+     "rect": [
+      230,
+      440,
+      424,
+      16
+     ]
+    }
+   ],
+   "thumbs": [
+    {
+     "id": "file0",
+     "rect": [
+      162,
+      73,
+      96,
+      96
+     ]
+    },
+    {
+     "id": "file1",
+     "rect": [
+      394,
+      73,
+      96,
+      96
+     ]
+    },
+    {
+     "id": "file2",
+     "rect": [
+      626,
+      73,
+      96,
+      96
+     ]
+    },
+    {
+     "id": "file3",
+     "rect": [
+      162,
+      253,
+      96,
+      96
+     ]
+    },
+    {
+     "id": "file4",
+     "rect": [
+      394,
+      253,
+      96,
+      96
+     ]
+    },
+    {
+     "id": "file5",
+     "rect": [
+      626,
+      253,
+      96,
+      96
+     ]
+    }
+   ],
+   "toggles": [
+    {
+     "id": "tab_local",
+     "rect": [
+      656,
+      13,
+      65,
+      36
+     ]
+    },
+    {
+     "id": "tab_usb",
+     "rect": [
+      723,
+      13,
+      57,
+      36
+     ]
+    }
+   ]
+  },
+  "home": {
+   "bars": [
+    {
+     "fill": 65535,
+     "id": "nozzle_bar",
+     "rect": [
+      115,
+      165,
+      142,
+      6
+     ],
+     "track": 8551
+    },
+    {
+     "fill": 65535,
+     "id": "bed_bar",
+     "rect": [
+      299,
+      165,
+      142,
+      6
+     ],
+     "track": 8551
+    },
+    {
+     "fill": 65535,
+     "id": "chamber_bar",
+     "rect": [
+      483,
+      165,
+      142,
+      6
+     ],
+     "track": 8551
+    }
+   ],
+   "bg": 1,
+   "dots": [
+    {
+     "color": 11959,
+     "id": "state_dot",
+     "rect": [
+      463,
+      27,
+      8,
+      8
+     ]
+    }
+   ],
+   "hits": [
+    {
+     "id": "nav_home",
+     "rect": [
+      8,
+      68,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_files",
+     "rect": [
+      8,
+      132,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_move",
+     "rect": [
+      8,
+      196,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_tools",
+     "rect": [
+      8,
+      260,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_settings",
+     "rect": [
+      8,
+      324,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "estop",
+     "rect": [
+      14,
+      410,
+      56,
+      56
+     ]
+    },
+    {
+     "id": "temp_nozzle",
+     "rect": [
+      100,
+      62,
+      172,
+      131
+     ]
+    },
+    {
+     "id": "temp_bed",
+     "rect": [
+      284,
+      62,
+      172,
+      131
+     ]
+    },
+    {
+     "id": "temp_chamber",
+     "rect": [
+      468,
+      62,
+      172,
+      131
+     ]
+    },
+    {
+     "id": "fans",
+     "rect": [
+      652,
+      62,
+      132,
+      131
+     ]
+    },
+    {
+     "id": "open_last",
+     "rect": [
+      117,
+      219,
+      228,
+      228
+     ]
+    },
+    {
+     "id": "reprint",
+     "rect": [
+      361,
+      395,
+      174,
+      52
+     ]
+    },
+    {
+     "id": "light",
+     "rect": [
+      564,
+      202,
+      104,
+      125
+     ]
+    },
+    {
+     "id": "filament",
+     "rect": [
+      680,
+      202,
+      104,
+      125
+     ]
+    },
+    {
+     "id": "home_all",
+     "rect": [
+      564,
+      339,
+      104,
+      125
+     ]
+    },
+    {
+     "id": "preheat",
+     "rect": [
+      680,
+      339,
+      104,
+      125
+     ]
+    }
+   ],
+   "on": 3,
+   "pressed": 2,
+   "texts": [
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "status",
+     "on": null,
+     "rect": [
+      100,
+      37,
+      340,
+      17
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "state",
+     "on": null,
+     "rect": [
+      478,
+      23,
+      62,
+      16
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "ip",
+     "on": null,
+     "rect": [
+      596,
+      23,
+      104,
+      16
+     ]
+    },
+    {
+     "align": "center",
+     "color": 38166,
+     "font": 0,
+     "id": "clock",
+     "on": null,
+     "rect": [
+      734,
+      23,
+      38,
+      16
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 3,
+     "id": "nozzle",
+     "on": null,
+     "rect": [
+      115,
+      115,
+      84,
+      42
+     ]
+    },
+    {
+     "align": "left",
+     "color": 64996,
+     "font": 1,
+     "id": "nozzle_target",
+     "on": null,
+     "rect": [
+      205,
+      126,
+      52,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 3,
+     "id": "bed",
+     "on": null,
+     "rect": [
+      299,
+      115,
+      84,
+      42
+     ]
+    },
+    {
+     "align": "left",
+     "color": 11959,
+     "font": 1,
+     "id": "bed_target",
+     "on": null,
+     "rect": [
+      389,
+      126,
+      52,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 3,
+     "id": "chamber",
+     "on": null,
+     "rect": [
+      483,
+      115,
+      84,
+      42
+     ]
+    },
+    {
+     "align": "left",
+     "color": 23375,
+     "font": 1,
+     "id": "chamber_target",
+     "on": null,
+     "rect": [
+      573,
+      126,
+      52,
+      20
+     ]
+    },
+    {
+     "align": "right",
+     "color": 61342,
+     "font": 0,
+     "id": "fan0",
+     "on": null,
+     "rect": [
+      729,
+      117,
+      40,
+      17
+     ]
+    },
+    {
+     "align": "right",
+     "color": 61342,
+     "font": 0,
+     "id": "fan1",
+     "on": null,
+     "rect": [
+      729,
+      139,
+      40,
+      17
+     ]
+    },
+    {
+     "align": "right",
+     "color": 61342,
+     "font": 0,
+     "id": "fan2",
+     "on": null,
+     "rect": [
+      729,
+      161,
+      40,
+      17
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 1,
+     "id": "last_name1",
+     "on": null,
+     "rect": [
+      361,
+      241,
+      174,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 1,
+     "id": "last_name2",
+     "on": null,
+     "rect": [
+      361,
+      261,
+      174,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "last_time",
+     "on": null,
+     "rect": [
+      384,
+      291,
+      150,
+      16
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "last_filament",
+     "on": null,
+     "rect": [
+      384,
+      314,
+      150,
+      16
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "last_result",
+     "on": null,
+     "rect": [
+      384,
+      337,
+      150,
+      16
+     ]
+    }
+   ],
+   "thumbs": [
+    {
+     "id": "last",
+     "rect": [
+      117,
+      219,
+      228,
+      228
+     ]
+    }
+   ],
+   "toggles": [
+    {
+     "id": "light",
+     "rect": [
+      564,
+      202,
+      104,
+      125
+     ]
+    }
+   ]
+  },
+  "keypad": {
+   "bars": [],
+   "bg": 29,
+   "dots": [],
+   "hits": [
+    {
+     "id": "k1",
+     "rect": [
+      171,
+      176,
+      107,
+      56
+     ]
+    },
+    {
+     "id": "k2",
+     "rect": [
+      288,
+      176,
+      107,
+      56
+     ]
+    },
+    {
+     "id": "k3",
+     "rect": [
+      405,
+      176,
+      107,
+      56
+     ]
+    },
+    {
+     "id": "kback",
+     "rect": [
+      522,
+      176,
+      107,
+      56
+     ]
+    },
+    {
+     "id": "k4",
+     "rect": [
+      171,
+      242,
+      107,
+      56
+     ]
+    },
+    {
+     "id": "k5",
+     "rect": [
+      288,
+      242,
+      107,
+      56
+     ]
+    },
+    {
+     "id": "k6",
+     "rect": [
+      405,
+      242,
+      107,
+      56
+     ]
+    },
+    {
+     "id": "ksign",
+     "rect": [
+      522,
+      242,
+      107,
+      56
+     ]
+    },
+    {
+     "id": "k7",
+     "rect": [
+      171,
+      308,
+      107,
+      56
+     ]
+    },
+    {
+     "id": "k8",
+     "rect": [
+      288,
+      308,
+      107,
+      56
+     ]
+    },
+    {
+     "id": "k9",
+     "rect": [
+      405,
+      308,
+      107,
+      56
+     ]
+    },
+    {
+     "id": "kdot",
+     "rect": [
+      522,
+      308,
+      107,
+      56
+     ]
+    },
+    {
+     "id": "cancel",
+     "rect": [
+      171,
+      374,
+      107,
+      56
+     ]
+    },
+    {
+     "id": "k0",
+     "rect": [
+      288,
+      374,
+      107,
+      56
+     ]
+    },
+    {
+     "id": "ok",
+     "rect": [
+      405,
+      374,
+      224,
+      56
+     ]
+    }
+   ],
+   "pressed": 30,
+   "texts": [
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 1,
+     "id": "title",
+     "on": null,
+     "rect": [
+      171,
+      45,
+      300,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "hint",
+     "on": null,
+     "rect": [
+      171,
+      68,
+      300,
+      16
+     ]
+    },
+    {
+     "align": "right",
+     "color": 61342,
+     "font": 3,
+     "id": "value",
+     "on": null,
+     "rect": [
+      210,
+      109,
+      400,
+      42
+     ]
+    }
+   ],
+   "thumbs": [],
+   "toggles": []
+  },
+  "message": {
+   "bars": [],
+   "bg": 33,
+   "dots": [],
+   "hits": [
+    {
+     "id": "ok",
+     "rect": [
+      195,
+      293,
+      410,
+      52
+     ]
+    }
+   ],
+   "pressed": 34,
+   "texts": [
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 2,
+     "id": "title",
+     "on": null,
+     "rect": [
+      247,
+      142,
+      340,
+      26
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "body1",
+     "on": null,
+     "rect": [
+      195,
+      193,
+      410,
+      18
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "body2",
+     "on": null,
+     "rect": [
+      195,
+      215,
+      410,
+      18
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "body3",
+     "on": null,
+     "rect": [
+      195,
+      237,
+      410,
+      18
+     ]
+    }
+   ],
+   "thumbs": [],
+   "toggles": []
+  },
+  "move": {
+   "bars": [],
+   "bg": 12,
+   "dots": [],
+   "hits": [
+    {
+     "id": "nav_home",
+     "rect": [
+      8,
+      68,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_files",
+     "rect": [
+      8,
+      132,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_move",
+     "rect": [
+      8,
+      196,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_tools",
+     "rect": [
+      8,
+      260,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_settings",
+     "rect": [
+      8,
+      324,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "estop",
+     "rect": [
+      14,
+      410,
+      56,
+      56
+     ]
+    },
+    {
+     "id": "step1",
+     "rect": [
+      533,
+      13,
+      52,
+      36
+     ]
+    },
+    {
+     "id": "step10",
+     "rect": [
+      588,
+      13,
+      52,
+      36
+     ]
+    },
+    {
+     "id": "step50",
+     "rect": [
+      643,
+      13,
+      52,
+      36
+     ]
+    },
+    {
+     "id": "step100",
+     "rect": [
+      698,
+      13,
+      82,
+      36
+     ]
+    },
+    {
+     "id": "y_plus",
+     "rect": [
+      204,
+      120,
+      80,
+      70
+     ]
+    },
+    {
+     "id": "y_minus",
+     "rect": [
+      204,
+      286,
+      80,
+      70
+     ]
+    },
+    {
+     "id": "x_minus",
+     "rect": [
+      125,
+      199,
+      70,
+      80
+     ]
+    },
+    {
+     "id": "x_plus",
+     "rect": [
+      291,
+      199,
+      70,
+      80
+     ]
+    },
+    {
+     "id": "home_xy",
+     "rect": [
+      212,
+      207,
+      64,
+      64
+     ]
+    },
+    {
+     "id": "z_up",
+     "rect": [
+      411,
+      101,
+      86,
+      118
+     ]
+    },
+    {
+     "id": "z_down",
+     "rect": [
+      411,
+      265,
+      86,
+      118
+     ]
+    },
+    {
+     "id": "retract",
+     "rect": [
+      537,
+      103,
+      111,
+      52
+     ]
+    },
+    {
+     "id": "extrude",
+     "rect": [
+      658,
+      103,
+      111,
+      52
+     ]
+    },
+    {
+     "id": "home_all",
+     "rect": [
+      522,
+      208,
+      262,
+      52
+     ]
+    },
+    {
+     "id": "filament",
+     "rect": [
+      522,
+      272,
+      262,
+      52
+     ]
+    },
+    {
+     "id": "motors_off",
+     "rect": [
+      522,
+      336,
+      262,
+      52
+     ]
+    },
+    {
+     "id": "temps",
+     "rect": [
+      522,
+      400,
+      262,
+      52
+     ]
+    }
+   ],
+   "on": 14,
+   "pressed": 13,
+   "texts": [
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "position",
+     "on": null,
+     "rect": [
+      100,
+      37,
+      340,
+      17
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "z",
+     "on": null,
+     "rect": [
+      411,
+      229,
+      86,
+      26
+     ]
+    },
+    {
+     "align": "left",
+     "color": 23375,
+     "font": 0,
+     "id": "extruder",
+     "on": null,
+     "rect": [
+      537,
+      165,
+      232,
+      16
+     ]
+    }
+   ],
+   "thumbs": [],
+   "toggles": [
+    {
+     "id": "step1",
+     "rect": [
+      533,
+      13,
+      52,
+      36
+     ]
+    },
+    {
+     "id": "step10",
+     "rect": [
+      588,
+      13,
+      52,
+      36
+     ]
+    },
+    {
+     "id": "step50",
+     "rect": [
+      643,
+      13,
+      52,
+      36
+     ]
+    },
+    {
+     "id": "step100",
+     "rect": [
+      698,
+      13,
+      82,
+      36
+     ]
+    }
+   ]
+  },
+  "preview": {
+   "bars": [],
+   "bg": 10,
+   "dots": [],
+   "hits": [
+    {
+     "id": "nav_home",
+     "rect": [
+      8,
+      68,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_files",
+     "rect": [
+      8,
+      132,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_move",
+     "rect": [
+      8,
+      196,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_tools",
+     "rect": [
+      8,
+      260,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_settings",
+     "rect": [
+      8,
+      324,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "estop",
+     "rect": [
+      14,
+      410,
+      56,
+      56
+     ]
+    },
+    {
+     "id": "back",
+     "rect": [
+      425,
+      393,
+      137,
+      52
+     ]
+    },
+    {
+     "id": "print",
+     "rect": [
+      572,
+      393,
+      191,
+      52
+     ]
+    }
+   ],
+   "pressed": 11,
+   "texts": [
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "where",
+     "on": null,
+     "rect": [
+      100,
+      37,
+      340,
+      17
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 2,
+     "id": "name1",
+     "on": null,
+     "rect": [
+      425,
+      81,
+      338,
+      26
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 2,
+     "id": "name2",
+     "on": null,
+     "rect": [
+      425,
+      107,
+      338,
+      26
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 1,
+     "id": "time",
+     "on": null,
+     "rect": [
+      467,
+      165,
+      220,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 1,
+     "id": "filament",
+     "on": null,
+     "rect": [
+      467,
+      213,
+      220,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 1,
+     "id": "layers",
+     "on": null,
+     "rect": [
+      467,
+      261,
+      220,
+      20
+     ]
+    }
+   ],
+   "thumbs": [
+    {
+     "id": "preview",
+     "rect": [
+      110,
+      127,
+      272,
+      272
+     ]
+    }
+   ],
+   "toggles": []
+  },
+  "printing": {
+   "bars": [
+    {
+     "fill": 65535,
+     "id": "progress",
+     "rect": [
+      369,
+      197,
+      394,
+      10
+     ],
+     "track": 8551
+    }
+   ],
+   "bg": 4,
+   "dots": [
+    {
+     "color": 64996,
+     "id": "state_dot",
+     "rect": [
+      622,
+      27,
+      8,
+      8
+     ]
+    }
+   ],
+   "hits": [
+    {
+     "id": "nav_home",
+     "rect": [
+      8,
+      68,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_files",
+     "rect": [
+      8,
+      132,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_move",
+     "rect": [
+      8,
+      196,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_tools",
+     "rect": [
+      8,
+      260,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_settings",
+     "rect": [
+      8,
+      324,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "estop",
+     "rect": [
+      14,
+      410,
+      56,
+      56
+     ]
+    },
+    {
+     "id": "set_nozzle",
+     "rect": [
+      100,
+      310,
+      129,
+      74
+     ]
+    },
+    {
+     "id": "set_bed",
+     "rect": [
+      239,
+      310,
+      129,
+      74
+     ]
+    },
+    {
+     "id": "set_speed",
+     "rect": [
+      378,
+      310,
+      129,
+      74
+     ]
+    },
+    {
+     "id": "set_flow",
+     "rect": [
+      516,
+      310,
+      129,
+      74
+     ]
+    },
+    {
+     "id": "set_zoffset",
+     "rect": [
+      655,
+      310,
+      129,
+      74
+     ]
+    },
+    {
+     "id": "pause",
+     "rect": [
+      100,
+      396,
+      300,
+      52
+     ]
+    },
+    {
+     "id": "stop",
+     "rect": [
+      410,
+      396,
+      300,
+      52
+     ]
+    },
+    {
+     "id": "light",
+     "rect": [
+      720,
+      396,
+      64,
+      52
+     ]
+    }
+   ],
+   "on": 6,
+   "pressed": 5,
+   "texts": [
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "file",
+     "on": null,
+     "rect": [
+      100,
+      37,
+      340,
+      17
+     ]
+    },
+    {
+     "align": "left",
+     "color": 64996,
+     "font": 0,
+     "id": "state",
+     "on": null,
+     "rect": [
+      637,
+      23,
+      62,
+      16
+     ]
+    },
+    {
+     "align": "center",
+     "color": 38166,
+     "font": 0,
+     "id": "clock",
+     "on": null,
+     "rect": [
+      733,
+      23,
+      38,
+      16
+     ]
+    },
+    {
+     "align": "right",
+     "color": 38166,
+     "font": 0,
+     "id": "layer",
+     "on": null,
+     "rect": [
+      543,
+      81,
+      220,
+      16
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 4,
+     "id": "percent",
+     "on": null,
+     "rect": [
+      369,
+      99,
+      220,
+      88
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 2,
+     "id": "left",
+     "on": null,
+     "rect": [
+      369,
+      253,
+      110,
+      26
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 2,
+     "id": "elapsed",
+     "on": null,
+     "rect": [
+      500,
+      253,
+      110,
+      26
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 2,
+     "id": "finish",
+     "on": null,
+     "rect": [
+      632,
+      253,
+      110,
+      26
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 2,
+     "id": "nozzle",
+     "on": null,
+     "rect": [
+      113,
+      340,
+      58,
+      26
+     ]
+    },
+    {
+     "align": "left",
+     "color": 23375,
+     "font": 0,
+     "id": "nozzle_target",
+     "on": null,
+     "rect": [
+      175,
+      345,
+      40,
+      16
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 2,
+     "id": "bed",
+     "on": null,
+     "rect": [
+      252,
+      340,
+      58,
+      26
+     ]
+    },
+    {
+     "align": "left",
+     "color": 23375,
+     "font": 0,
+     "id": "bed_target",
+     "on": null,
+     "rect": [
+      314,
+      345,
+      40,
+      16
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 2,
+     "id": "speed",
+     "on": null,
+     "rect": [
+      391,
+      340,
+      100,
+      26
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 2,
+     "id": "flow",
+     "on": null,
+     "rect": [
+      529,
+      340,
+      100,
+      26
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 2,
+     "id": "zoffset",
+     "on": null,
+     "rect": [
+      668,
+      340,
+      100,
+      26
+     ]
+    }
+   ],
+   "thumbs": [
+    {
+     "id": "print",
+     "rect": [
+      112,
+      74,
+      212,
+      212
+     ]
+    }
+   ],
+   "toggles": [
+    {
+     "id": "paused",
+     "rect": [
+      100,
+      396,
+      300,
+      52
+     ]
+    },
+    {
+     "id": "light",
+     "rect": [
+      720,
+      396,
+      64,
+      52
+     ]
+    }
+   ]
+  },
+  "settings": {
+   "bars": [],
+   "bg": 25,
+   "dots": [
+    {
+     "color": 11959,
+     "id": "klipper_dot",
+     "rect": [
+      761,
+      123,
+      8,
+      8
+     ]
+    }
+   ],
+   "hits": [
+    {
+     "id": "nav_home",
+     "rect": [
+      8,
+      68,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_files",
+     "rect": [
+      8,
+      132,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_move",
+     "rect": [
+      8,
+      196,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_tools",
+     "rect": [
+      8,
+      260,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_settings",
+     "rect": [
+      8,
+      324,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "estop",
+     "rect": [
+      14,
+      410,
+      56,
+      56
+     ]
+    },
+    {
+     "id": "wifi",
+     "rect": [
+      101,
+      99,
+      334,
+      54
+     ]
+    },
+    {
+     "id": "bright_down",
+     "rect": [
+      277,
+      267,
+      40,
+      36
+     ]
+    },
+    {
+     "id": "bright_up",
+     "rect": [
+      381,
+      267,
+      40,
+      36
+     ]
+    },
+    {
+     "id": "sleep",
+     "rect": [
+      101,
+      311,
+      334,
+      54
+     ]
+    },
+    {
+     "id": "restart_klipper",
+     "rect": [
+      449,
+      153,
+      334,
+      54
+     ]
+    },
+    {
+     "id": "restart_firmware",
+     "rect": [
+      449,
+      207,
+      334,
+      54
+     ]
+    },
+    {
+     "id": "about",
+     "rect": [
+      449,
+      261,
+      334,
+      54
+     ]
+    },
+    {
+     "id": "reboot",
+     "rect": [
+      448,
+      328,
+      162,
+      52
+     ]
+    },
+    {
+     "id": "shutdown",
+     "rect": [
+      622,
+      328,
+      162,
+      52
+     ]
+    }
+   ],
+   "pressed": 26,
+   "texts": [
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "versions",
+     "on": null,
+     "rect": [
+      100,
+      37,
+      340,
+      17
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "wifi",
+     "on": null,
+     "rect": [
+      157,
+      127,
+      200,
+      16
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "url",
+     "on": null,
+     "rect": [
+      157,
+      181,
+      200,
+      16
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 1,
+     "id": "brightness",
+     "on": null,
+     "rect": [
+      323,
+      275,
+      52,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "sleep",
+     "on": null,
+     "rect": [
+      157,
+      339,
+      200,
+      16
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "klipper",
+     "on": null,
+     "rect": [
+      505,
+      127,
+      200,
+      16
+     ]
+    }
+   ],
+   "thumbs": [],
+   "toggles": []
+  },
+  "temps": {
+   "bars": [],
+   "bg": 18,
+   "dots": [],
+   "hits": [
+    {
+     "id": "nav_home",
+     "rect": [
+      8,
+      68,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_files",
+     "rect": [
+      8,
+      132,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_move",
+     "rect": [
+      8,
+      196,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_tools",
+     "rect": [
+      8,
+      260,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_settings",
+     "rect": [
+      8,
+      324,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "estop",
+     "rect": [
+      14,
+      410,
+      56,
+      56
+     ]
+    },
+    {
+     "id": "close",
+     "rect": [
+      692,
+      13,
+      92,
+      36
+     ]
+    },
+    {
+     "id": "set_nozzle",
+     "rect": [
+      271,
+      108,
+      92,
+      38
+     ]
+    },
+    {
+     "id": "off_nozzle",
+     "rect": [
+      369,
+      108,
+      52,
+      38
+     ]
+    },
+    {
+     "id": "set_bed",
+     "rect": [
+      271,
+      162,
+      92,
+      38
+     ]
+    },
+    {
+     "id": "off_bed",
+     "rect": [
+      369,
+      162,
+      52,
+      38
+     ]
+    },
+    {
+     "id": "set_chamber",
+     "rect": [
+      271,
+      216,
+      92,
+      38
+     ]
+    },
+    {
+     "id": "off_chamber",
+     "rect": [
+      369,
+      216,
+      52,
+      38
+     ]
+    },
+    {
+     "id": "fan0_down",
+     "rect": [
+      617,
+      108,
+      44,
+      38
+     ]
+    },
+    {
+     "id": "fan0_up",
+     "rect": [
+      725,
+      108,
+      44,
+      38
+     ]
+    },
+    {
+     "id": "fan1_down",
+     "rect": [
+      617,
+      162,
+      44,
+      38
+     ]
+    },
+    {
+     "id": "fan1_up",
+     "rect": [
+      725,
+      162,
+      44,
+      38
+     ]
+    },
+    {
+     "id": "fan2_down",
+     "rect": [
+      617,
+      216,
+      44,
+      38
+     ]
+    },
+    {
+     "id": "fan2_up",
+     "rect": [
+      725,
+      216,
+      44,
+      38
+     ]
+    },
+    {
+     "id": "pre_pla",
+     "rect": [
+      100,
+      274,
+      162,
+      52
+     ]
+    },
+    {
+     "id": "pre_petg",
+     "rect": [
+      274,
+      274,
+      162,
+      52
+     ]
+    },
+    {
+     "id": "pre_abs",
+     "rect": [
+      448,
+      274,
+      162,
+      52
+     ]
+    },
+    {
+     "id": "cooldown",
+     "rect": [
+      622,
+      274,
+      162,
+      52
+     ]
+    }
+   ],
+   "pressed": 19,
+   "texts": [
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "nozzle",
+     "on": null,
+     "rect": [
+      157,
+      127,
+      90,
+      16
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 1,
+     "id": "nozzle_target",
+     "on": null,
+     "rect": [
+      282,
+      117,
+      70,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "bed",
+     "on": null,
+     "rect": [
+      157,
+      181,
+      90,
+      16
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 1,
+     "id": "bed_target",
+     "on": null,
+     "rect": [
+      282,
+      171,
+      70,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "chamber",
+     "on": null,
+     "rect": [
+      157,
+      235,
+      90,
+      16
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 1,
+     "id": "chamber_target",
+     "on": null,
+     "rect": [
+      282,
+      225,
+      70,
+      20
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 1,
+     "id": "fan0",
+     "on": null,
+     "rect": [
+      667,
+      117,
+      52,
+      20
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 1,
+     "id": "fan1",
+     "on": null,
+     "rect": [
+      667,
+      171,
+      52,
+      20
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 1,
+     "id": "fan2",
+     "on": null,
+     "rect": [
+      667,
+      225,
+      52,
+      20
+     ]
+    }
+   ],
+   "thumbs": [],
+   "toggles": []
+  },
+  "tool_run": {
+   "bars": [],
+   "bg": 22,
+   "dots": [],
+   "hits": [
+    {
+     "id": "nav_home",
+     "rect": [
+      8,
+      68,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_files",
+     "rect": [
+      8,
+      132,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_move",
+     "rect": [
+      8,
+      196,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_tools",
+     "rect": [
+      8,
+      260,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_settings",
+     "rect": [
+      8,
+      324,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "estop",
+     "rect": [
+      14,
+      410,
+      56,
+      56
+     ]
+    },
+    {
+     "id": "back",
+     "rect": [
+      100,
+      392,
+      200,
+      52
+     ]
+    }
+   ],
+   "on": 24,
+   "pressed": 23,
+   "texts": [
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 2,
+     "id": "title",
+     "on": null,
+     "rect": [
+      100,
+      8,
+      400,
+      26
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "subtitle",
+     "on": null,
+     "rect": [
+      100,
+      37,
+      340,
+      17
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 1,
+     "id": "step1",
+     "on": null,
+     "rect": [
+      153,
+      86,
+      520,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 1,
+     "id": "step2",
+     "on": null,
+     "rect": [
+      153,
+      141,
+      520,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 1,
+     "id": "step3",
+     "on": null,
+     "rect": [
+      153,
+      195,
+      520,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 1,
+     "id": "step4",
+     "on": null,
+     "rect": [
+      153,
+      249,
+      520,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 1,
+     "id": "status",
+     "on": null,
+     "rect": [
+      119,
+      321,
+      646,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "detail",
+     "on": null,
+     "rect": [
+      119,
+      347,
+      646,
+      16
+     ]
+    }
+   ],
+   "thumbs": [],
+   "toggles": [
+    {
+     "id": "done1",
+     "rect": [
+      115,
+      83,
+      26,
+      26
+     ]
+    },
+    {
+     "id": "done2",
+     "rect": [
+      115,
+      138,
+      26,
+      26
+     ]
+    },
+    {
+     "id": "done3",
+     "rect": [
+      115,
+      192,
+      26,
+      26
+     ]
+    },
+    {
+     "id": "done4",
+     "rect": [
+      115,
+      246,
+      26,
+      26
+     ]
+    }
+   ]
+  },
+  "tools": {
+   "bars": [],
+   "bg": 20,
+   "dots": [],
+   "hits": [
+    {
+     "id": "nav_home",
+     "rect": [
+      8,
+      68,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_files",
+     "rect": [
+      8,
+      132,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_move",
+     "rect": [
+      8,
+      196,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_tools",
+     "rect": [
+      8,
+      260,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_settings",
+     "rect": [
+      8,
+      324,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "estop",
+     "rect": [
+      14,
+      410,
+      56,
+      56
+     ]
+    },
+    {
+     "id": "level",
+     "rect": [
+      100,
+      62,
+      336,
+      250
+     ]
+    },
+    {
+     "id": "shaper",
+     "rect": [
+      448,
+      62,
+      336,
+      250
+     ]
+    }
+   ],
+   "pressed": 21,
+   "texts": [],
+   "thumbs": [],
+   "toggles": []
+  }
+ },
+ "size": [
+  800,
+  480
+ ]
+}

@@ -57,7 +57,7 @@ class EndToEndTest(unittest.TestCase):
         threading.Thread(target=self.http.serve_forever, daemon=True).start()
         self.master, self.slave = os.openpty()
         args = main_mod.parse_args([
-            "--port", os.ttyname(self.slave), "--poll", "0.1",
+            "--ui", "qidi", "--port", os.ttyname(self.slave), "--poll", "0.1",
             "--moonraker", "http://127.0.0.1:%d" % self.http.server_port])
         threading.Thread(target=main_mod.run, args=(args,),
                          daemon=True).start()

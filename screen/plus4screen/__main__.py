@@ -10,7 +10,8 @@ import time
 from . import __version__
 from .app import App, ThreadRunner
 from .moonraker import Moonraker
-from .tjc import Decoder, SerialPort
+from .tjc import Decoder, SerialPort, open_screen
+from .ui.app import UIApp
 
 QUIET_FLUSH = 0.05   # s of silence before a partial frame is decoded
 
@@ -23,6 +24,10 @@ def parse_args(argv):
                    help="serial port of the screen (default: %(default)s)")
     p.add_argument("--moonraker", default="http://127.0.0.1:7125",
                    help="Moonraker URL (default: %(default)s)")
+    p.add_argument("--ui", choices=("plus4", "qidi"), default="plus4",
+                   help="plus4: own interface, needs plus4ui.tft on the "
+                        "screen; qidi: QIDI's screen file (default: "
+                        "%(default)s)")
     p.add_argument("--lang", type=int, default=None,
                    help="force the screen language index (2 = English); "
                         "by default the language chosen on the screen is "
@@ -39,13 +44,20 @@ def parse_args(argv):
 
 
 def run(args):
-    port = SerialPort(args.port)
+    # QIDI's screen file always runs at 115200; ours may come up at 9600.
+    port = open_screen(args.port) if args.ui == "plus4" \
+        else SerialPort(args.port)
     runner = ThreadRunner()
-    app = App(port.write, Moonraker(args.moonraker), runner, lang=args.lang,
-              dry_run=args.dry_run)
+    if args.ui == "plus4":
+        app = UIApp(port.write, Moonraker(args.moonraker), runner,
+                    dry_run=args.dry_run)
+    else:
+        app = App(port.write, Moonraker(args.moonraker), runner,
+                  lang=args.lang, dry_run=args.dry_run)
     decoder = Decoder()
     logging.getLogger("plus4screen").info(
-        "started on %s, Moonraker %s%s", args.port, args.moonraker,
+        "started on %s (%s interface), Moonraker %s%s", args.port, args.ui,
+        args.moonraker,
         " (dry run)" if args.dry_run else "")
 
     app.poll()

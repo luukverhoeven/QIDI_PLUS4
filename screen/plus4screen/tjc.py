@@ -4,6 +4,9 @@ Commands to the screen are ASCII instructions terminated by ``FF FF FF``.
 What the screen sends back is decided by the event code in QIDI's layout
 (``UI/xindi_800_480.HMI``, see ``tools/hmi_dump.py``):
 
+* ``67 <x hi> <x lo> <y hi> <y lo> <1|0> FF FF FF`` - raw touch position
+  (press or release), sent after ``sendxy=1``; ``68`` is the same for the
+  touch that woke the screen.
 * ``65 <page> <widget> FF FF FF`` - a button was released. Buttons print
   this themselves (``prints 0x65,1`` ...), so there is no touch-type byte.
   The standard TJC form with a type byte is accepted as well.
@@ -21,6 +24,7 @@ import errno
 import os
 import select
 import termios
+import time
 
 TERM = b"\xff\xff\xff"
 
@@ -34,6 +38,7 @@ STRING = "string"    # text (reply to get)
 BOOT = "boot"        # screen (re)started
 NETTEST = "nettest"  # value: True entered, False left
 STATUS = "status"    # value: status/error code
+XY = "xy"            # value: (x, y, pressed)
 
 SINGLE_BYTE = {0x91: (BOOT, None), 0x92: (NETTEST, True),
                0x93: (NETTEST, False)}
@@ -129,6 +134,10 @@ class Decoder:
         code = frame[0]
         if code == 0x65 and len(frame) >= 3:
             return Event(TOUCH, page=frame[1], widget=frame[2], raw=frame)
+        if code in (0x67, 0x68) and len(frame) == 6:
+            x = frame[1] << 8 | frame[2]
+            y = frame[3] << 8 | frame[4]
+            return Event(XY, value=(x, y, bool(frame[5])), raw=frame)
         if code == 0x70:
             return Event(STRING, text=frame[1:].decode("utf-8", "replace"),
                          raw=frame)
@@ -136,6 +145,8 @@ class Decoder:
 
 
 BAUD = {115200: termios.B115200, 9600: termios.B9600}
+if hasattr(termios, "B921600"):         # Linux; used to write screen files
+    BAUD[921600] = termios.B921600
 
 
 class SerialPort:
@@ -187,3 +198,35 @@ class SerialPort:
 
     def close(self):
         os.close(self.fd)
+
+
+def answers(port, timeout=1.0):
+    """True if the screen answers ``connect`` at the port's speed."""
+    port.write(TERM + b"connect" + TERM)
+    termios.tcdrain(port.fd)
+    got = bytearray()
+    end = time.monotonic() + timeout
+    while time.monotonic() < end and b"comok" not in got:
+        readable, _, _ = select.select([port], [], [], 0.1)
+        if readable:
+            got.extend(port.read())
+    return b"comok" in got
+
+
+def open_screen(path, baud=115200, fallback=9600):
+    """Open the screen's port at ``baud``.
+
+    A screen file that leaves its speed at the TJC default (9600) is
+    switched to ``baud`` for this power cycle with ``baud=``.
+    """
+    port = SerialPort(path, baud)
+    if answers(port):
+        return port
+    port.close()
+    slow = SerialPort(path, fallback)
+    if answers(slow):
+        slow.write(encode("baud=%d" % baud))
+        termios.tcdrain(slow.fd)
+        time.sleep(0.2)
+    slow.close()
+    return SerialPort(path, baud)

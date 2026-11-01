@@ -17,6 +17,7 @@ OBJECTS = {
     "gcode_move": ["speed_factor", "extrude_factor", "homing_origin"],
     "motion_report": ["live_velocity"],
     "output_pin caselight": ["value"],
+    "toolhead": ["position", "homed_axes"],
 }
 
 # Fans in the order the screen shows them (n6, n7, n8 / slider 22, 23, 24).
@@ -56,6 +57,9 @@ class PrinterState:
         self.z_offset = origin[2] if len(origin) > 2 else 0.0
         self.velocity = g("motion_report", "live_velocity")
         self.caselight = bool(g("output_pin caselight", "value"))
+        position = g("toolhead", "position", None) or [0.0] * 4
+        self.position = list(position) + [0.0] * (4 - len(position))
+        self.homed_axes = g("toolhead", "homed_axes", "") or ""
 
     @property
     def ready(self):
