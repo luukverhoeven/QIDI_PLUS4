@@ -39,7 +39,7 @@ Layout-only changes (positions, texts, colours of live values) need step 4 too, 
 
 Needs the TJC editor "USART HMI" (Windows; version 1.68.2 was used) and the Inter fonts installed in Windows.
 
-1. Open `hmi/plus4ui.HMI`. Device: TJC8048X250_011, 0°, utf-8.
+1. Open `hmi/plus4ui.HMI`. Device: TJC8048X250_011, 0°, utf-8. Device settings → project: RAM file system size (内存文件存储区大小) 196608, room for the thumbnails.
 2. Pictures: delete all, then add every file of `build/pictures` in name order, so the IDs match the file numbers.
 3. Fonts: keep `f0`–`f4` in this order (`build_assets.py` lists them in `FONTS`). To remake one: Tools → font maker, Inter, encoding utf-8, anti-aliased, characters: printable ASCII plus `° · … – — ± ✓ × →`.
 
@@ -51,8 +51,17 @@ Needs the TJC editor "USART HMI" (Windows; version 1.68.2 was used) and the Inte
    | f3 | Bold | 40 | 34 px |
    | f4 | ExtraBold | 88 | 72 px |
 
-4. Pages: `page0` shows picture 0 and runs `printh 91` before it is drawn (plus4screen sees the screen start); `page1` is empty with background colour 2146 (`#0A0E13`).
-5. `Program.s` must contain `baud=115200`.
+4. Pages: `page0` shows picture 0 and runs `printh 91` before it is drawn (plus4screen sees the screen start). `page1` is the canvas: background `sta` picture, `pic` 1 (plus4screen sets `page1.pic` to the screen shown), with nine external picture objects `exp0`–`exp8`, path `ram/last.jpg`:
+
+   | Object | Size | Slot |
+   | --- | --- | --- |
+   | exp0 | 228 x 228 | home, last print |
+   | exp1 | 212 x 212 | printing |
+   | exp2 | 272 x 272 | preview |
+   | exp3–exp8 | 96 x 96 | files, cards 1–6 |
+
+   plus4screen moves and shows them; `w` and `h` cannot be changed at run time, so they must match the `data-thumb` slots of the design.
+5. `Program.s` must contain `baud=115200` and `sys2=<screen id>`; `build_assets.py` prints the id.
 6. Compile, then File → output production file, and copy `plus4ui.tft` to `build/`.
 
 ## Write it to the screen

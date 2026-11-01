@@ -85,10 +85,12 @@ class Home(Screen):
             self.app.runner.spawn(self.app.mr.last_job, self._got_last)
 
     def _got_last(self, job, error):
-        if error is None:
-            self.last = job
-            if self.app.current == self.name:
-                self.draw_last()
+        if error is not None:
+            self.asked = False        # e.g. Moonraker still starting: retry
+            return
+        self.last = job
+        if self.app.current == self.name:
+            self.draw_last()
 
     def enter(self, **options):
         self.draw_last()
@@ -121,6 +123,7 @@ class Home(Screen):
             return
         self.wrap(("last_name1", "last_name2"),
                   file_title(job.get("filename")))
+        self.app.thumbs.show("home", "last", job.get("filename"))
         meta = job.get("metadata") or self.app.metadata(
             job.get("filename")) or {}
         self.text("last_time", duration(job.get("print_duration")
@@ -181,6 +184,7 @@ class Printing(Screen):
         self.canvas.dot("state_dot", color)
         self.text("clock", clock(app.clock()))
         self.text("file", os.path.basename(s.filename))
+        app.thumbs.show("printing", "print", s.filename)
         self.text("percent", "%d%%" % int(s.progress * 100))
         self.canvas.bar("progress", s.progress)
         if s.total_layer:
@@ -309,6 +313,7 @@ class Files(Screen):
 
     def draw_card(self, i, entry):
         self.text("name%d" % i, file_title(entry["path"]))
+        self.app.thumbs.show("files", "file%d" % i, entry["path"])
         meta = self.app.metadata(entry["path"])
         if meta is None:
             self.text("meta%d" % i, "")
@@ -357,6 +362,7 @@ class Preview(Screen):
             "USB/") else "Local storage")
 
     def refresh(self, s):
+        self.app.thumbs.show("preview", "preview", self.filename)
         meta = self.app.metadata(self.filename)
         if meta is None:
             self.text("time", "Reading…", SUB)

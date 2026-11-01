@@ -11,15 +11,18 @@ It has two interfaces:
 
 ## Own interface
 
-Home, printing, files, file preview, move, filament (single spool), temperatures and fans, tools (auto bed levelling, input shaping), settings, about, plus a keypad, a confirm dialog and a message dialog.
+Home, printing, files, file preview, move, filament (single spool), temperatures and fans, tools (auto bed levelling, input shaping), settings, Wi-Fi, about, plus a keypad, a confirm dialog and a message dialog.
 
-- **Screen file:** `plus4ui.tft` holds only pictures and fonts: a boot page and an empty page. It has no buttons. Writing it replaces QIDI's screen file; [`install.sh`](install.sh) saves QIDI's copy first and [`uninstall.sh`](uninstall.sh) writes it back.
+- **Screen file:** `plus4ui.tft` holds only pictures and fonts: a boot page and a canvas page with nine picture objects for thumbnails. It has no buttons. Writing it replaces QIDI's screen file; [`install.sh`](install.sh) saves QIDI's copy first and [`uninstall.sh`](uninstall.sh) writes it back.
 - **Drawing:** each screen is a full-size picture (`pic`). Pressed and selected looks are cut from two more pictures of the same screen (`xpic`). Live values are drawn with `xstr` on top of the picture they sit on.
 - **Touch:** the screen reports raw touch positions (`sendxy=1`, frames `67 x y press`). `plus4screen` finds the button under the finger in [`plus4screen/ui_layout.json`](plus4screen/ui_layout.json).
 - **Screen off:** the backlight goes off after 5 minutes without a touch (Settings: 1, 2, 5, 10, 30 minutes or never). The touch that wakes it does nothing else. Brightness and sleep time are kept in `~/.config/plus4screen.json`.
+- **Thumbnails:** the slicer's picture of a file, from Moonraker, made into a JPEG with Pillow (installed on the Plus4) and written to the screen's RAM with `twfile`, one per main-loop pass. The screen repaints the page by itself while a file is written, so the canvas page's background picture follows the screen shown (`page1.pic`) and `plus4screen` draws the live values again afterwards.
+- **Wi-Fi:** Settings → Wi-Fi lists the networks in range and joins one, with an on-screen keyboard for the password. It talks to `wpa_supplicant`'s control socket, as QIDI's program does; the password goes only to `wpa_supplicant` and is not logged.
 - **Speed:** the screen talks at 115200 baud. If it comes up at the TJC default of 9600, `plus4screen` switches it over at start.
+- **Screen check:** the screen file's ID (`sys2`) must match `ui_layout.json`; with another screen file, touches are ignored.
 
-Not done yet: print thumbnails (the slots show an empty tile), Wi-Fi setup (use Fluidd or `nmtui`), bed screw adjustment.
+Not done yet: bed screw adjustment.
 
 How the design becomes `plus4ui.tft`: [`ui/README.md`](ui/README.md).
 
@@ -109,11 +112,12 @@ The script:
 2. copies the program to `/home/mks/plus4-screen`;
 3. saves QIDI's screen file as `/home/mks/qidi-screen-backup.tft` and writes `plus4ui.tft` (own interface only);
 4. stops and disables the stock service;
-5. installs and starts [`systemd/plus4-screen.service`](systemd/plus4-screen.service).
+5. lets the `netdev` group (`mks` is a member) use Wi-Fi control: `ctrl_interface_group=netdev` in `/etc/wpa_supplicant/wpa_supplicant-wlan0.conf` (QIDI's file has `0`), after which Wi-Fi restarts once (own interface only);
+6. installs and starts [`systemd/plus4-screen.service`](systemd/plus4-screen.service).
 
 Logs: `journalctl -u plus4-screen -f`.
 
-To undo, run `./uninstall.sh`. With the own interface it first writes QIDI's screen file back (about 30 minutes), then re-enables QIDI's service.
+To undo, run `./uninstall.sh`. With the own interface it first writes QIDI's screen file back (about 30 minutes), then sets Wi-Fi control back to `root` and re-enables QIDI's service.
 
 A QIDI update may re-enable the stock service; run `./install.sh --no-flash` again afterwards.
 
@@ -139,7 +143,8 @@ python3 -m unittest discover -s tests
 - **Page logic:** against a fake Moonraker.
 - **Layout check:** `pages.py` against QIDI's actual `UI/xindi_800_480.HMI`.
 - **End-to-end:** the real main loop on a pseudo-terminal with a stub Moonraker HTTP server.
-- **Own interface:** taps, keypad, navigation, sleep and the drawing cache against a fake printer ([`tests/test_ui.py`](tests/test_ui.py)).
+- **Own interface:** taps, keypad, navigation, sleep, the drawing cache, thumbnails and the `twfile` upload against a fake printer and screen ([`tests/test_ui.py`](tests/test_ui.py)).
+- **Wi-Fi:** the `wpa_supplicant` client and the Wi-Fi screens against a fake control socket ([`tests/test_wifi.py`](tests/test_wifi.py)).
 
 To add a page to QIDI's layout:
 1. Look it up in [`LAYOUT.md`](LAYOUT.md).

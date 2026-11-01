@@ -10,7 +10,7 @@ import time
 from . import __version__
 from .app import App, ThreadRunner
 from .moonraker import Moonraker
-from .tjc import Decoder, SerialPort, open_screen
+from .tjc import Decoder, SerialPort, open_screen, write_file
 from .ui.app import UIApp
 
 QUIET_FLUSH = 0.05   # s of silence before a partial frame is decoded
@@ -49,8 +49,10 @@ def run(args):
         else SerialPort(args.port)
     runner = ThreadRunner()
     if args.ui == "plus4":
+        def upload(name, data):
+            return write_file(port, name, data)
         app = UIApp(port.write, Moonraker(args.moonraker), runner,
-                    dry_run=args.dry_run)
+                    dry_run=args.dry_run, upload=upload)
     else:
         app = App(port.write, Moonraker(args.moonraker), runner,
                   lang=args.lang, dry_run=args.dry_run)
@@ -81,6 +83,8 @@ def run(args):
         for event in events:
             app.handle(event)
         runner.drain()
+        if hasattr(app, "pump") and not events:
+            app.pump()
         if now >= next_poll:
             app.poll()
             next_poll = now + args.poll

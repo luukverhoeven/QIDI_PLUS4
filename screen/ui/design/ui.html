@@ -357,6 +357,35 @@
  </div>
 </section>
 
+<!-- WI-FI NETWORKS -->
+<section class="screen" id="wifi" data-nav="settings">
+ <div class="main">
+  <div class="top"><div><div class="title">Wi-Fi</div><div class="subt f0" data-text="status" data-font="f0" style="width:420px" data-sample="Connected to Home · 192.168.86.210"></div></div>
+   <div class="chips"><div class="chip" data-hit="scan" style="height:36px"><i data-icon="refresh-cw"></i>Scan</div><div class="chip" data-hit="close" style="height:36px"><i data-icon="chevron-left"></i>Back</div></div></div>
+  <div class="card" id="wifi-list"></div>
+  <div class="row" style="margin-top:12px;gap:10px">
+   <div class="btn" data-hit="prev" style="width:120px"><i data-icon="chevron-left"></i>Back</div>
+   <div class="f0" data-text="page" data-font="f0" data-align="center" style="flex:1;height:16px;text-align:center;color:var(--sub)" data-sample="Page 1 of 2"></div>
+   <div class="btn" data-hit="next" style="width:120px">Next<i data-icon="chevron-right"></i></div>
+  </div>
+ </div>
+</section>
+
+<!-- WI-FI PASSWORD -->
+<section class="screen" id="wifi_pass">
+ <div class="main full">
+  <div class="top" style="height:58px">
+   <div class="f1" data-text="title" data-font="f1" style="height:20px;width:560px" data-sample="Password for Home"></div>
+   <div class="chips"><div class="chip" data-hit="cancel" style="height:36px"><i data-icon="x"></i>Cancel</div></div>
+  </div>
+  <div class="row" style="height:58px;border-radius:14px;background:var(--card);border:1px solid var(--line);padding:0 8px 0 18px;gap:10px">
+   <span class="f2" data-text="entry" data-font="f2" style="flex:1;height:26px" data-sample="********"></span>
+   <div class="btn" data-hit="show" data-on="show" style="height:44px;width:56px"><span class="when-off row"><i data-icon="eye"></i></span><span class="when-on row" style="color:var(--acc)"><i data-icon="eye-off"></i></span></div>
+  </div>
+  <div id="keyboard" style="display:grid;gap:8px;margin-top:14px"></div>
+ </div>
+</section>
+
 <!-- KEYPAD -->
 <section class="screen" id="keypad">
  <div class="dialog" style="left:150px;top:24px;width:500px;height:432px;padding:20px">
@@ -408,6 +437,31 @@ document.getElementById('file-grid').innerHTML = [0, 1, 2, 3, 4, 5].map(i => `
    <div class="f1" data-text="name${i}" data-font="f1" style="margin-top:8px;height:20px" data-sample="Macbook 14 Riser"></div>
    <div class="f0" data-text="meta${i}" data-font="f0" style="margin-top:2px;height:16px;color:var(--sub)" data-sample="2h 34m · 97 g · PLA"></div>
   </div>`).join('');
+
+// Six network rows.
+document.getElementById('wifi-list').innerHTML = [0, 1, 2, 3, 4, 5].map(i => `
+  <div class="list-row" data-hit="net${i}"${i === 0 ? ' style="border-top:0;border-radius:18px 18px 0 0"' : ''}>
+   <div class="ico acc"><i data-icon="wifi"></i></div>
+   <div><div class="f1" data-text="ssid${i}" data-font="f1" style="height:20px;width:380px" data-sample="${['Home', 'Home 5G', 'Neighbours', 'Office guest', '', ''][i]}"></div>
+    <div class="f0" data-text="info${i}" data-font="f0" style="height:16px;width:380px;color:var(--sub)" data-sample="${['Connected · strong signal', 'Secured · good signal', 'Secured · weak signal', 'Open · weak signal', '', ''][i]}"></div></div>
+   <div class="end"><i data-icon="chevron-right"></i></div>
+  </div>`).join('');
+
+// Keyboard: 27 keys with live labels and the special keys. Rows are 10 units wide.
+const keyRow = (cols, cells) => `<div style="display:grid;grid-template-columns:${cols};gap:8px">${cells}</div>`;
+const letters = 'qwertyuiopasdfghjkl-zxcvbnm';
+const key = i => `<div class="key" data-hit="key${i}" style="height:62px"><span class="f2" data-text="key${i}" data-font="f2" data-align="center" style="width:60px;height:26px;text-align:center" data-sample="${letters[i]}"></span></div>`;
+const range = (a, b) => Array.from({ length: b - a }, (_, k) => key(a + k)).join('');
+document.getElementById('keyboard').innerHTML =
+  keyRow('repeat(10,1fr)', range(0, 10)) +
+  keyRow('repeat(10,1fr)', range(10, 20)) +
+  keyRow('1.5fr repeat(7,1fr) 1.5fr',
+    '<div class="key" data-hit="shift" data-on="shift" style="height:62px"><i data-icon="arrow-big-up"></i></div>' + range(20, 27) +
+    '<div class="key" data-hit="back" style="height:62px"><i data-icon="delete"></i></div>') +
+  keyRow('1.5fr 6fr 2.5fr',
+    '<div class="key" data-hit="mode" style="height:62px"><span class="f1" data-text="mode" data-font="f1" data-align="center" style="width:80px;height:20px;text-align:center" data-sample="123"></span></div>' +
+    '<div class="key" data-hit="space" style="height:62px;font-size:15px;color:var(--sub)">space</div>' +
+    '<div class="key" data-hit="connect" style="height:62px;background:var(--acc);border-color:var(--acc);color:var(--accInk);font-size:17px">Connect</div>');
 </script>
 <script src="ui.js"></script>
 <style>
@@ -416,5 +470,6 @@ document.getElementById('file-grid').innerHTML = [0, 1, 2, 3, 4, 5].map(i => `
 .on > .when-off, .on .when-off { display: none !important; }
 .lightbtn.on { color: var(--amber) !important; border-color: rgba(251, 191, 36, .45); background: #221E12; }
 .pause.on { border-color: #1F5C55; }
+.key.on { background: #10272A; border-color: var(--acc); color: var(--acc); }
 </style>
 </body></html>

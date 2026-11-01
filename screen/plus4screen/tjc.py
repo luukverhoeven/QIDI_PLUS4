@@ -23,7 +23,9 @@ import collections
 import errno
 import logging
 import os
+import re
 import select
+import struct
 import termios
 import time
 
@@ -223,6 +225,7 @@ def open_screen(path, baud=115200, fallback=9600):
     switched to ``baud`` for this power cycle with ``baud=``.
     """
     port = SerialPort(path, baud)
+    end_transfer(port)          # a restart may have left one running
     if answers(port):
         return port
     port.close()
@@ -238,3 +241,133 @@ def open_screen(path, baud=115200, fallback=9600):
                     fallback)
     slow.close()
     return SerialPort(path, baud)
+
+
+# twfile: writes a file to the screen's file system (here: JPEG thumbnails
+# into ram/), as QIDI's xindi does. Each packet is a 12-byte header (magic,
+# packet number, length + 2), up to 2034 data bytes and their CRC-16/MODBUS,
+# low byte first. The screen answers 0x05 per packet and 0xFD at the end.
+TWFILE_MAGIC = bytes.fromhex("3aa1bb447ffffe")
+TWFILE_CHUNK = 2034
+TWFILE_ABORT = TWFILE_MAGIC + bytes.fromhex("00ffff0000")
+SENDME_REPLY = re.compile(rb"\x66.\xff\xff\xff", re.S)
+
+
+def crc16_modbus(data):
+    crc = 0xFFFF
+    for byte in data:
+        crc ^= byte
+        for _ in range(8):
+            crc = (crc >> 1) ^ 0xA001 if crc & 1 else crc >> 1
+    return crc
+
+
+def twfile_packets(data):
+    for number, start in enumerate(range(0, len(data), TWFILE_CHUNK)):
+        chunk = data[start:start + TWFILE_CHUNK]
+        yield (TWFILE_MAGIC + b"\x01"
+               + struct.pack("<HH", number, len(chunk) + 2) + chunk
+               + struct.pack("<H", crc16_modbus(chunk)))
+
+
+def _wait_for(port, codes, timeout, seen):
+    """Read until one of ``codes`` arrives; return it, or None."""
+    end = time.monotonic() + timeout
+    while time.monotonic() < end:
+        readable, _, _ = select.select([port], [], [], 0.05)
+        if readable:
+            data = port.read()
+            seen.extend(data)
+            for code in codes:
+                if code in data:
+                    return code
+    return None
+
+
+def sync(port, timeout=3.0):
+    """Wait until the screen has carried out every command sent so far.
+
+    The screen answers in order, so whatever arrives before the answer to
+    ``sendme`` (for example a late 0x06 from ``delfile`` while the screen
+    is still drawing) is dropped. Returns False if no answer came.
+    """
+    port.write(encode("sendme"))
+    termios.tcdrain(port.fd)
+    got = bytearray()
+    end = time.monotonic() + timeout
+    while time.monotonic() < end:
+        readable, _, _ = select.select([port], [], [], 0.05)
+        if readable:
+            got.extend(port.read())
+            if SENDME_REPLY.search(got):
+                return True
+    log.warning("screen did not answer sendme (got %s)",
+                bytes(got).hex() or "nothing")
+    return False
+
+
+def end_transfer(port):
+    """End a file transfer the screen may be in.
+
+    While a transfer runs, the screen takes everything as file data and
+    draws nothing. A pause of 20 ms marks a packet boundary; the abort
+    packet then ends the transfer (0xFD). Without a transfer the abort
+    bytes are a bad command, closed by TERM so the next command is clean.
+    A late 0xFE means the transfer only started now: abort once more.
+    """
+    for _ in range(2):
+        time.sleep(0.03)
+        port.write(TWFILE_ABORT)
+        termios.tcdrain(port.fd)
+        answer = _wait_for(port, (0xFD, 0xFE), 0.3, bytearray())
+        if answer == 0xFD:
+            break
+        if answer is None:
+            port.write(TERM)
+            time.sleep(0.05)
+            break
+    termios.tcflush(port.fd, termios.TCIFLUSH)
+
+
+def write_file(port, name, data):
+    """Replace ``name`` on the screen with ``data``; True when written."""
+    # Touch reports would mix with the acknowledgements.
+    port.write(encode("sendxy=0"))
+    port.write(encode('delfile "%s"' % name))    # 0x06 if it is missing
+    try:
+        if not sync(port):
+            end_transfer(port)
+            return False
+        return twfile(port, name, data)
+    finally:
+        port.write(encode("sendxy=1"))
+
+
+def twfile(port, name, data, timeout=2.0):
+    """Write ``data`` to the screen as ``name`` (e.g. "ram/t0.jpg").
+
+    Touch reports must be off (``sendxy=0``): their bytes could look like
+    acknowledgements. Returns False if the screen stopped answering.
+    """
+    port.write(encode('twfile "%s",%d' % (name, len(data))))
+    termios.tcdrain(port.fd)
+    seen = bytearray()
+    # 0xFE: file created, send the data. 0x06 frames may come first (seen
+    # while the screen repaints the page), so only a missing 0xFE means the
+    # file was refused, e.g. no room: the screen file needs a RAM file
+    # system, a project setting of the TJC editor.
+    ready = _wait_for(port, (0xFE,), 1.0, seen)
+    if ready is None:
+        log.warning("twfile %s: screen did not accept the file (got %s)",
+                    name, bytes(seen).hex() or "nothing")
+        end_transfer(port)      # in case the 0xFE comes after all
+        return False
+    for number, packet in enumerate(twfile_packets(data)):
+        seen = bytearray()
+        port.write(packet)
+        if _wait_for(port, (0x05, 0xFD), timeout, seen) is None:
+            log.warning("twfile %s: no answer to packet %d (got %s)",
+                        name, number, bytes(seen).hex() or "nothing")
+            end_transfer(port)
+            return False
+    return True

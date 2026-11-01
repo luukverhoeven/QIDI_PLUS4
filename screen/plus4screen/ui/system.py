@@ -234,8 +234,7 @@ class Settings(Screen):
             prefs.save()
             self.refresh(self.state)
         elif hit_id == "wifi":
-            app.message("Wi-Fi", "Change the Wi-Fi network in Fluidd or with "
-                        "nmtui over SSH.")
+            app.show("wifi")
         elif hit_id == "restart_klipper":
             self.klipper_action("Restart Klipper?", "Restart",
                                 "restart", app.mr.restart)

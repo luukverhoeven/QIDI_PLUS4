@@ -246,8 +246,39 @@
    "id": 34,
    "kind": "pressed",
    "screen": "message"
+  },
+  {
+   "file": "035_wifi_bg.png",
+   "id": 35,
+   "kind": "bg",
+   "screen": "wifi"
+  },
+  {
+   "file": "036_wifi_pressed.png",
+   "id": 36,
+   "kind": "pressed",
+   "screen": "wifi"
+  },
+  {
+   "file": "037_wifi_pass_bg.png",
+   "id": 37,
+   "kind": "bg",
+   "screen": "wifi_pass"
+  },
+  {
+   "file": "038_wifi_pass_pressed.png",
+   "id": 38,
+   "kind": "pressed",
+   "screen": "wifi_pass"
+  },
+  {
+   "file": "039_wifi_pass_on.png",
+   "id": 39,
+   "kind": "on",
+   "screen": "wifi_pass"
   }
  ],
+ "screen_id": 162270083,
  "screens": {
   "about": {
    "bars": [],
@@ -3675,6 +3706,1072 @@
    "texts": [],
    "thumbs": [],
    "toggles": []
+  },
+  "wifi": {
+   "bars": [],
+   "bg": 35,
+   "dots": [],
+   "hits": [
+    {
+     "id": "nav_home",
+     "rect": [
+      8,
+      68,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_files",
+     "rect": [
+      8,
+      132,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_move",
+     "rect": [
+      8,
+      196,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_tools",
+     "rect": [
+      8,
+      260,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "nav_settings",
+     "rect": [
+      8,
+      324,
+      68,
+      60
+     ]
+    },
+    {
+     "id": "estop",
+     "rect": [
+      14,
+      410,
+      56,
+      56
+     ]
+    },
+    {
+     "id": "scan",
+     "rect": [
+      603,
+      13,
+      87,
+      36
+     ]
+    },
+    {
+     "id": "close",
+     "rect": [
+      698,
+      13,
+      86,
+      36
+     ]
+    },
+    {
+     "id": "net0",
+     "rect": [
+      101,
+      63,
+      682,
+      54
+     ]
+    },
+    {
+     "id": "net1",
+     "rect": [
+      101,
+      117,
+      682,
+      54
+     ]
+    },
+    {
+     "id": "net2",
+     "rect": [
+      101,
+      171,
+      682,
+      54
+     ]
+    },
+    {
+     "id": "net3",
+     "rect": [
+      101,
+      225,
+      682,
+      54
+     ]
+    },
+    {
+     "id": "net4",
+     "rect": [
+      101,
+      279,
+      682,
+      54
+     ]
+    },
+    {
+     "id": "net5",
+     "rect": [
+      101,
+      333,
+      682,
+      54
+     ]
+    },
+    {
+     "id": "prev",
+     "rect": [
+      100,
+      400,
+      120,
+      52
+     ]
+    },
+    {
+     "id": "next",
+     "rect": [
+      664,
+      400,
+      120,
+      52
+     ]
+    }
+   ],
+   "pressed": 36,
+   "texts": [
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "status",
+     "on": null,
+     "rect": [
+      100,
+      37,
+      420,
+      17
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 1,
+     "id": "ssid0",
+     "on": null,
+     "rect": [
+      157,
+      72,
+      380,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "info0",
+     "on": null,
+     "rect": [
+      157,
+      92,
+      380,
+      16
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 1,
+     "id": "ssid1",
+     "on": null,
+     "rect": [
+      157,
+      127,
+      380,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "info1",
+     "on": null,
+     "rect": [
+      157,
+      147,
+      380,
+      16
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 1,
+     "id": "ssid2",
+     "on": null,
+     "rect": [
+      157,
+      181,
+      380,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "info2",
+     "on": null,
+     "rect": [
+      157,
+      201,
+      380,
+      16
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 1,
+     "id": "ssid3",
+     "on": null,
+     "rect": [
+      157,
+      235,
+      380,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "info3",
+     "on": null,
+     "rect": [
+      157,
+      255,
+      380,
+      16
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 1,
+     "id": "ssid4",
+     "on": null,
+     "rect": [
+      157,
+      289,
+      380,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "info4",
+     "on": null,
+     "rect": [
+      157,
+      309,
+      380,
+      16
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 1,
+     "id": "ssid5",
+     "on": null,
+     "rect": [
+      157,
+      343,
+      380,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 38166,
+     "font": 0,
+     "id": "info5",
+     "on": null,
+     "rect": [
+      157,
+      363,
+      380,
+      16
+     ]
+    },
+    {
+     "align": "center",
+     "color": 38166,
+     "font": 0,
+     "id": "page",
+     "on": null,
+     "rect": [
+      230,
+      418,
+      424,
+      16
+     ]
+    }
+   ],
+   "thumbs": [],
+   "toggles": []
+  },
+  "wifi_pass": {
+   "bars": [],
+   "bg": 37,
+   "dots": [],
+   "hits": [
+    {
+     "id": "cancel",
+     "rect": [
+      674,
+      11,
+      102,
+      36
+     ]
+    },
+    {
+     "id": "show",
+     "rect": [
+      711,
+      65,
+      56,
+      44
+     ]
+    },
+    {
+     "id": "key0",
+     "rect": [
+      24,
+      130,
+      68,
+      62
+     ]
+    },
+    {
+     "id": "key1",
+     "rect": [
+      100,
+      130,
+      68,
+      62
+     ]
+    },
+    {
+     "id": "key2",
+     "rect": [
+      176,
+      130,
+      68,
+      62
+     ]
+    },
+    {
+     "id": "key3",
+     "rect": [
+      252,
+      130,
+      68,
+      62
+     ]
+    },
+    {
+     "id": "key4",
+     "rect": [
+      328,
+      130,
+      68,
+      62
+     ]
+    },
+    {
+     "id": "key5",
+     "rect": [
+      404,
+      130,
+      68,
+      62
+     ]
+    },
+    {
+     "id": "key6",
+     "rect": [
+      480,
+      130,
+      68,
+      62
+     ]
+    },
+    {
+     "id": "key7",
+     "rect": [
+      556,
+      130,
+      68,
+      62
+     ]
+    },
+    {
+     "id": "key8",
+     "rect": [
+      632,
+      130,
+      68,
+      62
+     ]
+    },
+    {
+     "id": "key9",
+     "rect": [
+      708,
+      130,
+      68,
+      62
+     ]
+    },
+    {
+     "id": "key10",
+     "rect": [
+      24,
+      200,
+      68,
+      62
+     ]
+    },
+    {
+     "id": "key11",
+     "rect": [
+      100,
+      200,
+      68,
+      62
+     ]
+    },
+    {
+     "id": "key12",
+     "rect": [
+      176,
+      200,
+      68,
+      62
+     ]
+    },
+    {
+     "id": "key13",
+     "rect": [
+      252,
+      200,
+      68,
+      62
+     ]
+    },
+    {
+     "id": "key14",
+     "rect": [
+      328,
+      200,
+      68,
+      62
+     ]
+    },
+    {
+     "id": "key15",
+     "rect": [
+      404,
+      200,
+      68,
+      62
+     ]
+    },
+    {
+     "id": "key16",
+     "rect": [
+      480,
+      200,
+      68,
+      62
+     ]
+    },
+    {
+     "id": "key17",
+     "rect": [
+      556,
+      200,
+      68,
+      62
+     ]
+    },
+    {
+     "id": "key18",
+     "rect": [
+      632,
+      200,
+      68,
+      62
+     ]
+    },
+    {
+     "id": "key19",
+     "rect": [
+      708,
+      200,
+      68,
+      62
+     ]
+    },
+    {
+     "id": "shift",
+     "rect": [
+      24,
+      270,
+      103,
+      62
+     ]
+    },
+    {
+     "id": "key20",
+     "rect": [
+      135,
+      270,
+      69,
+      62
+     ]
+    },
+    {
+     "id": "key21",
+     "rect": [
+      212,
+      270,
+      69,
+      62
+     ]
+    },
+    {
+     "id": "key22",
+     "rect": [
+      289,
+      270,
+      69,
+      62
+     ]
+    },
+    {
+     "id": "key23",
+     "rect": [
+      366,
+      270,
+      69,
+      62
+     ]
+    },
+    {
+     "id": "key24",
+     "rect": [
+      442,
+      270,
+      69,
+      62
+     ]
+    },
+    {
+     "id": "key25",
+     "rect": [
+      519,
+      270,
+      69,
+      62
+     ]
+    },
+    {
+     "id": "key26",
+     "rect": [
+      596,
+      270,
+      69,
+      62
+     ]
+    },
+    {
+     "id": "back",
+     "rect": [
+      673,
+      270,
+      103,
+      62
+     ]
+    },
+    {
+     "id": "mode",
+     "rect": [
+      24,
+      340,
+      110,
+      62
+     ]
+    },
+    {
+     "id": "space",
+     "rect": [
+      142,
+      340,
+      442,
+      62
+     ]
+    },
+    {
+     "id": "connect",
+     "rect": [
+      592,
+      340,
+      184,
+      62
+     ]
+    }
+   ],
+   "on": 39,
+   "pressed": 38,
+   "texts": [
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 1,
+     "id": "title",
+     "on": null,
+     "rect": [
+      24,
+      19,
+      560,
+      20
+     ]
+    },
+    {
+     "align": "left",
+     "color": 61342,
+     "font": 2,
+     "id": "entry",
+     "on": null,
+     "rect": [
+      43,
+      74,
+      658,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key0",
+     "on": null,
+     "rect": [
+      28,
+      148,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key1",
+     "on": null,
+     "rect": [
+      104,
+      148,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key2",
+     "on": null,
+     "rect": [
+      180,
+      148,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key3",
+     "on": null,
+     "rect": [
+      256,
+      148,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key4",
+     "on": null,
+     "rect": [
+      332,
+      148,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key5",
+     "on": null,
+     "rect": [
+      408,
+      148,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key6",
+     "on": null,
+     "rect": [
+      484,
+      148,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key7",
+     "on": null,
+     "rect": [
+      560,
+      148,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key8",
+     "on": null,
+     "rect": [
+      636,
+      148,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key9",
+     "on": null,
+     "rect": [
+      712,
+      148,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key10",
+     "on": null,
+     "rect": [
+      28,
+      218,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key11",
+     "on": null,
+     "rect": [
+      104,
+      218,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key12",
+     "on": null,
+     "rect": [
+      180,
+      218,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key13",
+     "on": null,
+     "rect": [
+      256,
+      218,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key14",
+     "on": null,
+     "rect": [
+      332,
+      218,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key15",
+     "on": null,
+     "rect": [
+      408,
+      218,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key16",
+     "on": null,
+     "rect": [
+      484,
+      218,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key17",
+     "on": null,
+     "rect": [
+      560,
+      218,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key18",
+     "on": null,
+     "rect": [
+      636,
+      218,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key19",
+     "on": null,
+     "rect": [
+      712,
+      218,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key20",
+     "on": null,
+     "rect": [
+      140,
+      288,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key21",
+     "on": null,
+     "rect": [
+      216,
+      288,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key22",
+     "on": null,
+     "rect": [
+      293,
+      288,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key23",
+     "on": null,
+     "rect": [
+      370,
+      288,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key24",
+     "on": null,
+     "rect": [
+      447,
+      288,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key25",
+     "on": null,
+     "rect": [
+      524,
+      288,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 2,
+     "id": "key26",
+     "on": null,
+     "rect": [
+      600,
+      288,
+      60,
+      26
+     ]
+    },
+    {
+     "align": "center",
+     "color": 61342,
+     "font": 1,
+     "id": "mode",
+     "on": null,
+     "rect": [
+      39,
+      361,
+      80,
+      20
+     ]
+    }
+   ],
+   "thumbs": [],
+   "toggles": [
+    {
+     "id": "show",
+     "rect": [
+      711,
+      65,
+      56,
+      44
+     ]
+    },
+    {
+     "id": "shift",
+     "rect": [
+      24,
+      270,
+      103,
+      62
+     ]
+    }
+   ]
   }
  },
  "size": [

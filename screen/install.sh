@@ -19,6 +19,8 @@ MODE_FILE=$DEST/.mode
 SCREEN_FILE=$DEST/.screen-file     # which screen file is on the screen
 TFT="$SRC/ui/build/plus4ui.tft"
 BACKUP=/home/mks/qidi-screen-backup.tft
+WPA_CONF=/etc/wpa_supplicant/wpa_supplicant-wlan0.conf
+WPA_UNIT=makerbase-wlan0.service
 
 mode=plus4
 flash=1
@@ -106,6 +108,20 @@ if [ "$mode" = plus4 ]; then
         sleep 6
     fi
     echo plus4ui > "$SCREEN_FILE"
+fi
+
+if [ "$mode" = plus4 ]; then
+    # The Wi-Fi screen talks to wpa_supplicant's control socket. Let the
+    # netdev group (mks is a member) use it; QIDI's file has group 0.
+    if sudo grep -q '^ctrl_interface_group=0$' "$WPA_CONF" 2>/dev/null; then
+        sudo cp -p "$WPA_CONF" "$WPA_CONF.plus4screen-backup"
+        sudo sed -i 's/^ctrl_interface_group=0$/ctrl_interface_group=netdev/' \
+            "$WPA_CONF"
+        echo "Wi-Fi control: allowed for group netdev. Wi-Fi restarts in a few"
+        echo "seconds ($WPA_UNIT); the connection drops briefly."
+        sudo systemd-run --quiet --on-active=8 \
+            /bin/systemctl restart "$WPA_UNIT"
+    fi
 fi
 
 echo "Starting $UNIT"

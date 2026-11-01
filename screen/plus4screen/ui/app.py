@@ -16,7 +16,8 @@ from ..moonraker import MoonrakerError
 from ..printer import OBJECTS, PrinterState
 from .canvas import Canvas
 from .layout import Layout
-from . import control, dialogs, home, system
+from .thumbs import Thumbs
+from . import control, dialogs, home, system, wifi
 
 log = logging.getLogger("plus4screen")
 
@@ -54,8 +55,9 @@ class Prefs(dict):
 
 class UIApp:
     def __init__(self, write, moonraker, runner, layout=None, dry_run=False,
-                 prefs_path=PREFS_PATH, clock=time.time):
+                 prefs_path=PREFS_PATH, clock=time.time, upload=None):
         self.write = write
+        self.upload = upload          # (name, bytes) -> ok; see thumbs.py
         self.mr = moonraker
         self.runner = runner
         self.dry_run = dry_run
@@ -64,7 +66,7 @@ class UIApp:
         self.prefs = Prefs(prefs_path)
         self.state = PrinterState(online=False)
         self.screens = {}
-        for module in (home, control, system, dialogs):
+        for module in (home, control, system, dialogs, wifi):
             for name, cls in module.SCREENS.items():
                 self.screens[name] = cls(self)
         self.current = None
@@ -79,6 +81,7 @@ class UIApp:
         self.net = {"ip": "", "ssid": ""}
         self.net_at = -NET_REFRESH
         self.meta = {}                  # filename -> slicer metadata
+        self.thumbs = Thumbs(self)
 
     # Output -----------------------------------------------------------------
 
@@ -171,12 +174,18 @@ class UIApp:
         return None
 
     def forget_changed_metadata(self, files):
-        """Drop metadata of files that changed since it was read."""
+        """Drop metadata and thumbnails of files changed since read."""
         for entry in files:
             meta = self.meta.get(entry.get("path"))
             if meta and meta.get("modified") not in (None,
                                                      entry.get("modified")):
                 del self.meta[entry["path"]]
+                self.thumbs.forget(entry["path"])
+
+    def pump(self):
+        """Background screen work between events: one thumbnail upload."""
+        if self.touch_hit is None and not self.asleep:
+            self.thumbs.pump()
 
     def motion_reason(self):
         """Why the axes, extruder and heaters must not be touched now."""

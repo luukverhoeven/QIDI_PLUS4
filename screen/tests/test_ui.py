@@ -3,6 +3,7 @@
 import os
 import tempfile
 import unittest
+from unittest import mock
 
 from plus4screen import tjc
 from plus4screen.ui.app import UIApp
@@ -72,6 +73,25 @@ class SyncRunner:
             on_done(result, error)
 
 
+class LastJobRetryTest(unittest.TestCase):
+    def test_last_print_is_asked_again_after_an_error(self):
+        mr = FakeMoonraker()
+        calls = []
+
+        def last_job():
+            calls.append(1)
+            if len(calls) == 1:
+                raise OSError("Connection refused")
+            return {"filename": "a.gcode", "status": "completed"}
+        mr.last_job = last_job
+        app = UIApp(lambda d: None, mr, SyncRunner(), LAYOUT,
+                    prefs_path=os.path.join(tempfile.mkdtemp(), "p.json"))
+        app.poll()
+        app.poll()
+        self.assertEqual(len(calls), 2)
+        self.assertEqual(app.screens["home"].last["filename"], "a.gcode")
+
+
 class DeferredRunner(SyncRunner):
     """Keeps calls until run_all(), like the threads on the printer."""
 
@@ -97,6 +117,8 @@ class UITest(unittest.TestCase):
                          prefs_path=prefs, clock=lambda: self.now[0])
         self.app.poll()
         self.app.start()
+        # The screen answers "get sys2" with the id of its screen file.
+        self.app.handle(tjc.Event(tjc.NUMBER, value=LAYOUT.screen_id))
         self.sent.clear()
 
     def write(self, data):
@@ -121,9 +143,10 @@ class UITest(unittest.TestCase):
 
     def test_start_turns_on_touch_positions_and_draws_home(self):
         self.app.start()
-        self.assertEqual(self.sent[:5], [
-            "bkcmd=2", "sendxy=1", "dim=80", "page 1",
-            "pic 0,0,%d" % LAYOUT["home"].bg])
+        bg = LAYOUT["home"].bg
+        self.assertEqual(self.sent[:8], [
+            "bkcmd=2", "sendxy=1", "dim=80", "get sys2", "page 1",
+            "vis 255,0", "page1.pic=%d" % bg, "pic 0,0,%d" % bg])
         self.assertEqual(self.app.current, "home")
 
     # Touch ------------------------------------------------------------------
@@ -349,6 +372,291 @@ class UITest(unittest.TestCase):
         self.app.show("move")       # e.g. a message popped up
         self.app.on_touch(x + 1, y + 1, False)
         self.assertEqual(self.mr.scripts, [])
+
+
+    # Thumbnails --------------------------------------------------------------
+
+    def with_thumbnails(self):
+        from plus4screen.ui import thumbs
+        self.uploads = []
+        self.app.upload = lambda name, data: self.uploads.append(
+            (name, data)) or True
+        self.mr.metadata = lambda path: {"estimated_time": 60, "thumbnails": [
+            {"width": 32, "relative_path": ".thumbs/x-32.png"},
+            {"width": 300, "relative_path": ".thumbs/x-300.png"}]}
+        self.mr.download = lambda root, path: b"PNG " + path.encode()
+        original = thumbs.make_jpeg
+        thumbs.make_jpeg = lambda data, size: b"JPEG %d " % size + data
+        self.addCleanup(setattr, thumbs, "make_jpeg", original)
+
+    def test_file_thumbnails_are_uploaded_and_shown(self):
+        self.with_thumbnails()
+        self.app.show("files")
+        while self.app.thumbs.pump():
+            pass
+        self.assertEqual(self.uploads, [
+            ("ram/t3.jpg", b"JPEG 96 PNG .thumbs/x-300.png")])
+        x, y, _, _ = LAYOUT["files"].thumbs["file0"].rect
+        for command in ('exp3.path="ram/t3.jpg"', "exp3.x=%d" % x,
+                        "exp3.y=%d" % y, "vis exp3,1"):
+            self.assertIn(command, self.sent)
+        # Shown already: nothing is sent again.
+        self.sent.clear()
+        self.app.poll()
+        while self.app.thumbs.pump():
+            pass
+        self.assertNotIn("vis exp3,1", self.sent)
+        # Another screen hides it before its picture is drawn.
+        self.sent.clear()
+        self.app.show("move")
+        self.assertLess(self.sent.index("vis exp3,0"),
+                        self.sent.index("pic 0,0,%d" % LAYOUT["move"].bg))
+
+    def test_thumbnail_is_not_uploaded_twice(self):
+        self.with_thumbnails()
+        self.app.show("files")
+        while self.app.thumbs.pump():
+            pass
+        self.app.show("move")
+        self.app.show("files")
+        while self.app.thumbs.pump():
+            pass
+        self.assertEqual(len(self.uploads), 1)
+        self.assertIn("vis exp3,1", self.sent)
+
+    def test_screen_picture_is_also_the_page_background(self):
+        self.app.show("files")
+        bg = LAYOUT["files"].bg
+        self.assertLess(self.sent.index("page1.pic=%d" % bg),
+                        self.sent.index("pic 0,0,%d" % bg))
+
+    def test_live_content_is_drawn_again_after_an_upload(self):
+        # Writing a file makes the screen repaint the page from its
+        # background picture, which wipes texts and blanked cards.
+        self.with_thumbnails()
+        self.app.show("files")
+        self.sent.clear()
+        while self.app.thumbs.pump():
+            pass
+        empty = LAYOUT["files"].hit("file1").rect
+        fill = "fill %d,%d,%d,%d,%d" % (tuple(empty) + (BG,))
+        self.assertIn(fill, self.sent)
+        name = [c for c in self.sent if c.endswith(',"a"')]
+        self.assertTrue(name)
+        self.assertLess(self.sent.index(fill), self.sent.index("vis exp3,1"))
+
+    def test_restored_card_is_not_blanked_again_after_an_upload(self):
+        self.with_thumbnails()
+        runner = DeferredRunner()
+        self.app.runner = runner
+        self.app.show("files")      # no files yet: every card blanked
+        runner.run_all()            # one file arrives: card 0 restored
+        while runner.pending or self.app.thumbs.queue:
+            runner.run_all()
+            self.app.thumbs.pump()
+        card = LAYOUT["files"].hit("file0").rect
+        self.sent.clear()
+        self.app.canvas.repaint()
+        self.assertNotIn("fill %d,%d,%d,%d,%d" % (tuple(card) + (BG,)),
+                         self.sent)
+
+    def test_new_picture_in_a_shown_slot_is_drawn_again(self):
+        self.with_thumbnails()
+        self.app.show("files")
+        while self.app.thumbs.pump():
+            pass
+        self.sent.clear()
+        for _ in range(2):          # the first call makes the picture
+            self.app.thumbs.show("files", "file0", "b.gcode")
+        while self.app.thumbs.pump():
+            pass
+        self.assertEqual([name for name, _ in self.uploads],
+                         ["ram/t3.jpg", "ram/t3.jpg"])
+        self.assertIn('exp3.path="ram/t3.jpg"', self.sent)
+        self.assertIn("ref exp3", self.sent)
+
+    def test_pressing_a_card_redraws_its_thumbnail(self):
+        self.with_thumbnails()
+        self.app.show("files")
+        while self.app.thumbs.pump():
+            pass
+        self.sent.clear()
+        self.tap("tab_local")   # a press elsewhere does not touch it
+        self.assertNotIn("ref exp3", self.sent)
+        x, y, w, h = LAYOUT["files"].hit("file0").rect
+        self.app.on_touch(x + 2, y + 2, True)
+        self.assertIn("ref exp3", self.sent)
+
+
+class TwfileTest(unittest.TestCase):
+    class Port:
+        def write(self, data):
+            self.written.append(bytes(data))
+
+        def fileno(self):
+            return os.open(os.devnull, os.O_RDONLY)
+
+        def __init__(self):
+            self.written = []
+            self.fd = None
+            self.replies = [b"\xfe\xff\xff\xff"]
+
+        def read(self):
+            return self.replies.pop(0) if self.replies else b"\x05"
+
+    def test_packets_and_acks(self):
+        import select as select_mod
+        import termios as termios_mod
+        port = self.Port()
+        originals = (tjc.select.select, tjc.termios.tcdrain, tjc.time.sleep)
+        tjc.select.select = lambda r, w, x, t: (r, [], [])
+        tjc.termios.tcdrain = lambda fd: None
+        tjc.time.sleep = lambda s: None
+        try:
+            self.assertTrue(tjc.twfile(port, "ram/t0.jpg", bytes(3000)))
+        finally:
+            (tjc.select.select, tjc.termios.tcdrain,
+             tjc.time.sleep) = originals
+        self.assertEqual(port.written[0], b'twfile "ram/t0.jpg",3000'
+                         + tjc.TERM)
+        self.assertEqual([len(p) for p in port.written[1:]],
+                         [12 + 2034 + 2, 12 + 966 + 2])
+        self.assertIs(select_mod.select, tjc.select.select)
+        self.assertIs(termios_mod.tcdrain, tjc.termios.tcdrain)
+
+    def test_crc(self):
+        self.assertEqual(tjc.crc16_modbus(b"123456789"), 0x4B37)
+
+
+class ScriptedPort:
+    """Answers like the screen: in order, after each write."""
+
+    def __init__(self, answer):
+        self.answer = answer        # written bytes -> reply, or replies
+        self.written = []
+        self.pending = []           # one reply per read
+        self.fd = None
+
+    def write(self, data):
+        self.written.append(bytes(data))
+        reply = self.answer(bytes(data))
+        self.pending.extend(reply if isinstance(reply, tuple) else
+                            [reply] if reply else [])
+
+    def read(self):
+        return self.pending.pop(0) if self.pending else b""
+
+
+def screen_answers(twfile=b"\xfe\xff\xff\xff", packet=b"\x05",
+                   sendme=b"\x66\x01\xff\xff\xff", abort=b""):
+    def answer(data):
+        if data.startswith(tjc.TWFILE_ABORT):
+            return abort
+        if data.startswith(tjc.TWFILE_MAGIC):
+            return packet
+        if data.startswith(b"twfile"):
+            return twfile
+        if data.startswith(b"sendme"):
+            return sendme
+        return b""
+    return answer
+
+
+class WriteFileTest(unittest.TestCase):
+    def setUp(self):
+        clock = [0.0]
+
+        def monotonic():
+            clock[0] += 0.05
+            return clock[0]
+        for target, name, value in (
+                (tjc.select, "select", lambda r, w, x, t: (r, [], [])),
+                (tjc.termios, "tcdrain", lambda fd: None),
+                (tjc.termios, "tcflush", lambda fd, q: None),
+                (tjc.time, "sleep", lambda s: None),
+                (tjc.time, "monotonic", monotonic)):
+            patcher = mock.patch.object(target, name, value)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+
+    def commands(self, port):
+        return [w for w in port.written if w.endswith(tjc.TERM)]
+
+    def test_late_reply_of_an_earlier_command_is_not_taken_for_twfile(self):
+        # delfile of a missing file fails (0x06); while the screen is busy
+        # drawing, that reply comes late, just before sendme's answer.
+        port = ScriptedPort(screen_answers(
+            sendme=(b"\x06\xff\xff\xff", b"\x66\x01\xff\xff\xff")))
+        self.assertTrue(tjc.write_file(port, "ram/t5.jpg", bytes(10)))
+        sent = self.commands(port)
+        self.assertEqual(sent[:4], [tjc.encode(c) for c in (
+            "sendxy=0", 'delfile "ram/t5.jpg"', "sendme",
+            'twfile "ram/t5.jpg",10')])
+        self.assertEqual(sent[-1], tjc.encode("sendxy=1"))
+
+    def test_other_replies_before_the_ready_answer_are_skipped(self):
+        # While the file is made the screen may send 0x06 frames first.
+        port = ScriptedPort(screen_answers(
+            twfile=(b"\x06\xff\xff\xff", b"\x06\xff\xff\xff",
+                    b"\xfe\xff\xff\xff")))
+        self.assertTrue(tjc.write_file(port, "ram/t6.jpg", bytes(10)))
+        self.assertNotIn(tjc.TWFILE_ABORT, port.written)
+
+    def test_transfer_is_ended_when_a_packet_gets_no_answer(self):
+        port = ScriptedPort(screen_answers(packet=b"",
+                                           abort=b"\xfd\xff\xff\xff"))
+        self.assertFalse(tjc.write_file(port, "ram/t5.jpg", bytes(10)))
+        self.assertIn(tjc.TWFILE_ABORT, port.written)
+        self.assertEqual(port.written[-1], tjc.encode("sendxy=1"))
+
+    def test_transfer_is_ended_when_twfile_gets_no_answer(self):
+        # The screen may still start the transfer after we gave up.
+        port = ScriptedPort(screen_answers(twfile=b""))
+        self.assertFalse(tjc.write_file(port, "ram/t5.jpg", bytes(10)))
+        abort = port.written.index(tjc.TWFILE_ABORT)
+        # No transfer ran: TERM closes the abort bytes as one bad command,
+        # so they do not spoil sendxy=1.
+        self.assertEqual(port.written[abort + 1], tjc.TERM)
+        self.assertFalse(any(w.startswith(tjc.TWFILE_MAGIC + b"\x01")
+                             for w in port.written))
+
+    def test_ready_answer_during_the_abort_is_aborted_again(self):
+        aborts = []
+
+        def answer(data):
+            if data.startswith(tjc.TWFILE_ABORT):
+                aborts.append(data)
+                # The first abort crosses the late 0xFE of the transfer.
+                return b"\xfe\xff\xff\xff" if len(aborts) == 1 \
+                    else b"\xfd\xff\xff\xff"
+            return screen_answers(twfile=b"")(data)
+        port = ScriptedPort(answer)
+        self.assertFalse(tjc.write_file(port, "ram/t5.jpg", bytes(10)))
+        self.assertEqual(len(aborts), 2)
+        self.assertNotIn(tjc.TERM, port.written)
+
+    def test_no_answer_to_sendme_ends_a_stuck_transfer(self):
+        port = ScriptedPort(screen_answers(sendme=b""))
+        self.assertFalse(tjc.write_file(port, "ram/t5.jpg", bytes(10)))
+        self.assertIn(tjc.TWFILE_ABORT, port.written)
+        self.assertFalse(any(w.startswith(b"twfile") for w in port.written))
+
+    def test_no_room_on_the_screen(self):
+        port = ScriptedPort(screen_answers(twfile=b"\x06\xff\xff\xff"))
+        self.assertFalse(tjc.write_file(port, "ram/t0.jpg", bytes(10)))
+        self.assertFalse(any(w.startswith(tjc.TWFILE_MAGIC + b"\x01")
+                             for w in port.written))    # no data was sent
+
+    def test_start_ends_a_transfer_left_running(self):
+        def answer(data):
+            if data.startswith(tjc.TWFILE_ABORT):
+                return b"\xfd\xff\xff\xff"
+            return b"comok 2,1281-0" if b"connect" in data else b""
+        port = ScriptedPort(answer)
+        with mock.patch.object(tjc, "SerialPort", lambda path, baud: port):
+            self.assertIs(tjc.open_screen("/dev/ttyS1"), port)
+        self.assertEqual(port.written[0], tjc.TWFILE_ABORT)
+
 
 
 class ScreenIdTest(unittest.TestCase):

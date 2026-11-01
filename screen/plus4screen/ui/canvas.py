@@ -6,6 +6,12 @@ pictures of the same screen (``xpic``); live text is drawn with ``xstr``
 on top of the picture it sits on, so it never needs a background colour.
 
 Everything sent is remembered, so a refresh only sends what changed.
+
+The screen repaints the page by itself while a file (a thumbnail) is
+written to it: from the page's own background picture, then the thumbnail
+objects, wiping everything drawn here. So page 1 has a picture background
+(``sta`` 2) that follows the screen shown (``page1.pic``), and ``repaint``
+draws the live content again after each upload.
 """
 
 from .. import tjc
@@ -20,6 +26,12 @@ def intersects(a, b):
     return ax < bx + bw and bx < ax + aw and ay < by + bh and by < ay + ah
 
 
+def inside(a, b):
+    ax, ay, aw, ah = a
+    bx, by, bw, bh = b
+    return bx <= ax and by <= ay and ax + aw <= bx + bw and ay + ah <= by + bh
+
+
 class Canvas:
     def __init__(self, send, layout):
         self.send = send
@@ -31,6 +43,8 @@ class Canvas:
         self.texts = {}              # text id -> (value, colour)
         self.bars = {}               # bar id -> (fraction, colour)
         self.dots = {}               # dot id -> colour
+        self.fills = []              # (rect, colour) painted by blank()
+        self.objects = {}            # visible picture object -> (rect, path)
 
     # Screens ----------------------------------------------------------------
 
@@ -38,13 +52,21 @@ class Canvas:
         """Draw a screen from scratch."""
         if self.page != CANVAS_PAGE:
             self.send("page %d" % CANVAS_PAGE)
+            self.send("vis 255,0")   # the thumbnail objects start hidden
             self.page = CANVAS_PAGE
+            self.objects = {}
+        # Hide thumbnails before the picture: hiding repaints their area.
+        for number in sorted(self.objects):
+            self.send("vis exp%d,0" % number)
+        self.objects = {}
         self.screen = self.layout[name]
         self.pressed = None
         self.toggles = {}
         self.texts = {}
         self.bars = {}
         self.dots = {}
+        self.fills = []
+        self.send("page%d.pic=%d" % (CANVAS_PAGE, self.screen.bg))
         self.send("pic 0,0,%d" % self.screen.bg)
 
     def forget(self):
@@ -95,9 +117,36 @@ class Canvas:
         x, y, w, h = rect
         self.send("fill %d,%d,%d,%d,%d" % (x, y, w, h, color))
 
+    def thumb(self, number, rect, path, reload=False):
+        """Show picture object ``exp<number>`` at ``rect`` with a file
+        written to the screen (see thumbs.py); ``reload`` after the file
+        was written again under the same name."""
+        if self.objects.get(number) == (tuple(rect), path) and not reload:
+            return
+        x, y, _, _ = rect
+        self.send('exp%d.path="%s"' % (number, path))
+        self.send("exp%d.x=%d" % (number, x))
+        self.send("exp%d.y=%d" % (number, y))
+        if number in self.objects:
+            self.send("ref exp%d" % number)
+        else:
+            self.send("vis exp%d,1" % number)
+        self.objects[number] = (tuple(rect), path)
+
+    def hide_thumb(self, number):
+        shown = self.objects.pop(number, None)
+        if shown is not None:
+            self.send("vis exp%d,0" % number)
+            self._restore(shown[0])
+
     def blank(self, rect, color):
         """Paint over a region and forget the live content drawn in it."""
+        for number in [n for n, (r, _) in self.objects.items()
+                       if intersects(r, rect)]:
+            self.send("vis exp%d,0" % number)
+            del self.objects[number]
         self.fill(rect, color)
+        self.fills.append((tuple(rect), color))
         for cache, items in ((self.texts, self.screen.texts),
                              (self.bars, self.screen.bars),
                              (self.dots, self.screen.dots)):
@@ -107,7 +156,29 @@ class Canvas:
 
     def restore(self, rect):
         """Cut a region from its picture again (after ``blank``)."""
+        self.fills = [f for f in self.fills if not inside(f[0], rect)]
         self._restore(rect)
+
+    def repaint(self):
+        """Draw the live content again after the screen repainted the page
+        from its background picture."""
+        s = self.screen
+        if s is None:
+            return
+        if s.on is not None:
+            for toggle_id, on in sorted(self.toggles.items()):
+                if on:
+                    self._cut(s.toggles[toggle_id].rect, s.on)
+        if self.pressed is not None and s.pressed is not None:
+            self._cut(s.hit(self.pressed).rect, s.pressed)
+        for rect, color in self.fills:
+            self.fill(rect, color)
+        for text_id, (value, color) in self.texts.items():
+            self._draw_text(s.texts[text_id], value, color)
+        for bar_id, key in self.bars.items():
+            self._draw_bar(s.bars[bar_id], key)
+        for dot_id, color in self.dots.items():
+            self._draw_dot(s.dots[dot_id], color)
 
     # Touch feedback ---------------------------------------------------------
 
@@ -143,9 +214,7 @@ class Canvas:
 
     def _restore(self, rect):
         """Cut a region from its current picture, then draw what is in it."""
-        x, y, w, h = rect
-        self.send("xpic %d,%d,%d,%d,%d,%d,%d"
-                  % (x, y, w, h, x, y, self.picture_at(rect)))
+        self._cut(rect, self.picture_at(rect))
         s = self.screen
         for text_id, (value, color) in self.texts.items():
             item = s.texts[text_id]
@@ -159,6 +228,13 @@ class Canvas:
             item = s.dots[dot_id]
             if intersects(item.rect, rect):
                 self._draw_dot(item, color)
+        for number, (obj_rect, _) in sorted(self.objects.items()):
+            if intersects(obj_rect, rect):
+                self.send("ref exp%d" % number)
+
+    def _cut(self, rect, picture):
+        x, y, w, h = rect
+        self.send("xpic %d,%d,%d,%d,%d,%d,%d" % (x, y, w, h, x, y, picture))
 
     def _draw_text(self, item, value, color):
         x, y, w, h = item.rect
@@ -170,8 +246,7 @@ class Canvas:
     def _draw_bar(self, item, key):
         width, color = key
         x, y, w, h = item.rect
-        self.send("xpic %d,%d,%d,%d,%d,%d,%d"
-                  % (x, y, w, h, x, y, self.picture_at(item.rect)))
+        self._cut(item.rect, self.picture_at(item.rect))
         if width > 0:
             self.send("fill %d,%d,%d,%d,%d" % (x, y, width, h, color))
 

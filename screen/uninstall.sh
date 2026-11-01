@@ -46,6 +46,15 @@ sudo systemctl disable --now "$UNIT" 2>/dev/null || true
 sudo rm -f /etc/systemd/system/$UNIT
 sudo systemctl daemon-reload
 
+WPA_CONF=/etc/wpa_supplicant/wpa_supplicant-wlan0.conf
+if sudo grep -q '^ctrl_interface_group=netdev$' "$WPA_CONF" 2>/dev/null; then
+    echo "Wi-Fi control: back to root only (Wi-Fi restarts in a few seconds)"
+    sudo sed -i 's/^ctrl_interface_group=netdev$/ctrl_interface_group=0/' \
+        "$WPA_CONF"
+    sudo systemd-run --quiet --on-active=8 \
+        /bin/systemctl restart makerbase-wlan0.service
+fi
+
 echo "Re-enabling $stock"
 sudo systemctl enable "$stock"
 sudo systemctl start "$stock"
