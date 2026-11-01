@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>plus4screen UI</title>
+<link rel="stylesheet" href="ui.css">
+</head>
+<body>
+
+<!-- BOOT -->
+<section class="screen" id="boot">
+ <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px">
+  <div class="logo" style="width:96px;height:96px;border-radius:28px;margin:0"><i data-icon="layers" style="width:50px;height:50px"></i></div>
+  <div style="font-size:30px;font-weight:800;letter-spacing:-.02em">QIDI Plus4</div>
+  <div class="f0" data-text="boot_msg" data-font="f0" data-align="center" style="width:400px;height:18px;text-align:center;color:var(--sub)" data-sample="Connecting to Klipper"></div>
+ </div>
+</section>
+
+<!-- HOME -->
+<section class="screen" id="home" data-nav="home">
+ <div class="main">
+  <div class="top">
+   <div><div class="title">QIDI Plus4</div><div class="subt f0" data-text="status" data-font="f0" data-sample="Ready to print"></div></div>
+   <div class="chips">
+    <div class="chip"><span data-dot="state_dot" style="width:8px;height:8px;border-radius:50%;background:var(--acc)"></span><span class="f0" data-text="state" data-font="f0" style="width:62px;height:16px" data-sample="Ready"></span></div>
+    <div class="chip"><i data-icon="wifi"></i><span class="f0" data-text="ip" data-font="f0" style="width:104px;height:16px" data-sample="192.168.86.210"></span></div>
+    <div class="chip"><span class="f0" data-text="clock" data-font="f0" data-align="center" style="width:38px;height:16px;text-align:center" data-sample="17:24"></span></div>
+   </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;height:128px">
+   <div class="card" style="padding:14px" data-hit="temp_nozzle">
+    <div class="row" style="gap:8px"><div class="ico amb"><i data-icon="flame"></i></div><span class="lbl">Nozzle</span></div>
+    <div class="row" style="margin-top:8px;height:42px;gap:6px"><span class="f3" data-text="nozzle" data-font="f3" style="width:84px;height:42px" data-sample="186°"></span><span class="f1" data-text="nozzle_target" data-font="f1" style="width:52px;height:20px;color:var(--amber)" data-sample="220°"></span></div>
+    <div class="bar" data-bar="nozzle_bar" data-fill="#FBBF24" data-sample="84" style="margin-top:8px"></div>
+   </div>
+   <div class="card" style="padding:14px" data-hit="temp_bed">
+    <div class="row" style="gap:8px"><div class="ico acc"><i data-icon="square-dashed"></i></div><span class="lbl">Bed</span></div>
+    <div class="row" style="margin-top:8px;height:42px;gap:6px"><span class="f3" data-text="bed" data-font="f3" style="width:84px;height:42px" data-sample="60°"></span><span class="f1" data-text="bed_target" data-font="f1" style="width:52px;height:20px;color:var(--acc)" data-sample="60°"></span></div>
+    <div class="bar" data-bar="bed_bar" data-sample="100" style="margin-top:8px"></div>
+   </div>
+   <div class="card" style="padding:14px" data-hit="temp_chamber">
+    <div class="row" style="gap:8px"><div class="ico"><i data-icon="box"></i></div><span class="lbl">Chamber</span></div>
+    <div class="row" style="margin-top:8px;height:42px;gap:6px"><span class="f3" data-text="chamber" data-font="f3" style="width:84px;height:42px" data-sample="31°"></span><span class="f1" data-text="chamber_target" data-font="f1" style="width:52px;height:20px;color:var(--mute)" data-sample="off"></span></div>
+    <div class="bar" data-bar="chamber_bar" data-sample="0" style="margin-top:8px"></div>
+   </div>
+   <div class="card" style="padding:14px" data-hit="fans">
+    <div class="row" style="gap:8px"><div class="ico blu"><i data-icon="fan"></i></div><span class="lbl">Fans</span></div>
+    <div style="margin-top:10px;display:grid;gap:5px;font-size:13px;color:var(--sub)">
+     <div class="row" style="height:17px"><span>Part</span><span class="f0" data-text="fan0" data-font="f0" data-align="right" style="margin-left:auto;width:40px;height:17px;text-align:right;color:var(--text)" data-sample="0%"></span></div>
+     <div class="row" style="height:17px"><span>Aux</span><span class="f0" data-text="fan1" data-font="f0" data-align="right" style="margin-left:auto;width:40px;height:17px;text-align:right;color:var(--text)" data-sample="0%"></span></div>
+     <div class="row" style="height:17px"><span>Exhaust</span><span class="f0" data-text="fan2" data-font="f0" data-align="right" style="margin-left:auto;width:40px;height:17px;text-align:right;color:var(--text)" data-sample="30%"></span></div>
+    </div>
+   </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 220px;gap:12px;margin-top:12px;height:262px">
+   <div class="card" style="padding:16px;display:flex;gap:16px">
+    <div class="thumb" data-thumb="last" data-hit="open_last" style="width:228px;height:228px"></div>
+    <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+     <span class="lbl">Last print</span>
+     <div class="f1" data-text="last_name1" data-font="f1" style="margin-top:8px;height:20px" data-sample="Macbook 14 Riser"></div>
+     <div class="f1" data-text="last_name2" data-font="f1" style="height:20px" data-sample=""></div>
+     <div style="display:grid;gap:7px;margin-top:10px;color:var(--sub)">
+      <div class="row" style="gap:8px"><i data-icon="clock" style="width:15px;height:15px"></i><span class="f0" data-text="last_time" data-font="f0" style="width:150px;height:16px" data-sample="2h 34m"></span></div>
+      <div class="row" style="gap:8px"><i data-icon="weight" style="width:15px;height:15px"></i><span class="f0" data-text="last_filament" data-font="f0" style="width:150px;height:16px" data-sample="97 g · PLA"></span></div>
+      <div class="row" style="gap:8px"><i data-icon="circle-check" style="width:15px;height:15px;color:var(--acc)"></i><span class="f0" data-text="last_result" data-font="f0" style="width:150px;height:16px" data-sample="Finished today"></span></div>
+     </div>
+     <div class="btn pri" data-hit="reprint" style="margin-top:auto"><i data-icon="rotate-ccw"></i>Print again</div>
+    </div>
+   </div>
+   <div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:12px">
+    <div class="card tile" data-hit="light" data-on="light"><div class="ico"><i data-icon="lightbulb"></i></div><div class="name">Light</div><div class="sub"><span class="when-off">Off</span><span class="when-on">On</span></div></div>
+    <div class="card tile" data-hit="filament"><div class="ico"><i data-icon="cable"></i></div><div class="name">Filament</div><div class="sub">Single spool</div></div>
+    <div class="card tile" data-hit="home_all"><div class="ico"><i data-icon="house"></i></div><div class="name">Home</div><div class="sub">All axes</div></div>
+    <div class="card tile" data-hit="preheat"><div class="ico"><i data-icon="thermometer"></i></div><div class="name">Preheat</div><div class="sub">PLA 220 / 60</div></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- PRINTING -->
+<section class="screen" id="printing" data-nav="home">
+ <div class="main">
+  <div class="top">
+   <div><div class="title">Printing</div><div class="subt f0" data-text="file" data-font="f0" data-sample="Macbook_14__Riser.gcode"></div></div>
+   <div class="chips">
+    <div class="chip"><span data-dot="state_dot" style="width:8px;height:8px;border-radius:50%;background:var(--amber)"></span><span class="f0" data-text="state" data-font="f0" style="width:62px;height:16px;color:var(--amber)" data-sample="Printing"></span></div>
+    <div class="chip"><span class="f0" data-text="clock" data-font="f0" data-align="center" style="width:38px;height:16px;text-align:center" data-sample="17:24"></span></div>
+   </div>
+  </div>
+  <div style="display:grid;grid-template-columns:236px 1fr;gap:12px;height:236px">
+   <div class="card" style="display:grid;place-items:center"><div class="thumb" data-thumb="print" style="width:212px;height:212px"></div></div>
+   <div class="card" style="padding:18px 20px;display:flex;flex-direction:column">
+    <div class="row"><span class="lbl">Progress</span><span class="f0" data-text="layer" data-font="f0" data-align="right" style="margin-left:auto;width:220px;height:16px;text-align:right;color:var(--sub)" data-sample="Layer 112 / 240 · Z 22.40"></span></div>
+    <div class="f4" data-text="percent" data-font="f4" style="margin-top:2px;height:88px;width:220px;line-height:88px" data-sample="47%"></div>
+    <div class="bar" data-bar="progress" data-sample="47" style="height:10px;border-radius:5px;margin-top:10px"></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);margin-top:auto">
+     <div><div class="lbl" style="color:var(--mute)">Time left</div><div class="f2" data-text="left" data-font="f2" style="margin-top:3px;height:26px;width:110px" data-sample="1h 21m"></div></div>
+     <div><div class="lbl" style="color:var(--mute)">Elapsed</div><div class="f2" data-text="elapsed" data-font="f2" style="margin-top:3px;height:26px;width:110px" data-sample="1h 13m"></div></div>
+     <div><div class="lbl" style="color:var(--mute)">Finish</div><div class="f2" data-text="finish" data-font="f2" style="margin-top:3px;height:26px;width:110px" data-sample="18:45"></div></div>
+    </div>
+   </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:12px;height:74px">
+   <div class="card" data-hit="set_nozzle" style="padding:11px 12px"><div class="lbl" style="font-size:10px">Nozzle</div><div class="row" style="margin-top:6px;height:26px;gap:4px"><span class="f2" data-text="nozzle" data-font="f2" style="height:26px;width:58px" data-sample="220°"></span><span class="f0" data-text="nozzle_target" data-font="f0" style="height:16px;width:40px;color:var(--mute)" data-sample="/ 220"></span></div></div>
+   <div class="card" data-hit="set_bed" style="padding:11px 12px"><div class="lbl" style="font-size:10px">Bed</div><div class="row" style="margin-top:6px;height:26px;gap:4px"><span class="f2" data-text="bed" data-font="f2" style="height:26px;width:58px" data-sample="60°"></span><span class="f0" data-text="bed_target" data-font="f0" style="height:16px;width:40px;color:var(--mute)" data-sample="/ 60"></span></div></div>
+   <div class="card" data-hit="set_speed" style="padding:11px 12px"><div class="lbl" style="font-size:10px">Speed</div><div class="f2" data-text="speed" data-font="f2" style="margin-top:6px;height:26px;width:100px" data-sample="100%"></div></div>
+   <div class="card" data-hit="set_flow" style="padding:11px 12px"><div class="lbl" style="font-size:10px">Flow</div><div class="f2" data-text="flow" data-font="f2" style="margin-top:6px;height:26px;width:100px" data-sample="100%"></div></div>
+   <div class="card" data-hit="set_zoffset" style="padding:11px 12px;border-color:#1F5C55"><div class="lbl" style="font-size:10px;color:var(--acc)">Z offset</div><div class="f2" data-text="zoffset" data-font="f2" style="margin-top:6px;height:26px;width:100px" data-sample="+0.020"></div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 64px;gap:10px;margin-top:12px">
+   <div class="btn warn pause" data-hit="pause" data-on="paused"><span class="when-off row" style="gap:8px"><i data-icon="pause"></i>Pause</span><span class="when-on row" style="gap:8px;color:var(--acc)"><i data-icon="play"></i>Resume</span></div>
+   <div class="btn dan" data-hit="stop"><i data-icon="square"></i>Stop</div>
+   <div class="btn lightbtn" data-hit="light" data-on="light" style="color:var(--mute)"><i data-icon="lightbulb"></i></div>
+  </div>
+ </div>
+</section>
+
+<!-- FILES -->
+<section class="screen" id="files" data-nav="files">
+ <div class="main">
+  <div class="top">
+   <div><div class="title">Files</div><div class="subt f0" data-text="summary" data-font="f0" data-sample="24 files · newest first"></div></div>
+   <div class="chips"><div class="seg"><div data-hit="tab_local" data-on="tab_local">Local</div><div data-hit="tab_usb" data-on="tab_usb">USB</div></div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,168px);gap:12px" id="file-grid"></div>
+  <div class="row" style="margin-top:12px;gap:10px">
+   <div class="btn" data-hit="prev" style="width:120px"><i data-icon="chevron-left"></i>Back</div>
+   <div class="f0" data-text="page" data-font="f0" data-align="center" style="flex:1;height:16px;text-align:center;color:var(--sub)" data-sample="Page 1 of 4"></div>
+   <div class="btn" data-hit="next" style="width:120px">Next<i data-icon="chevron-right"></i></div>
+  </div>
+ </div>
+</section>
+
+<!-- PREVIEW -->
+<section class="screen" id="preview" data-nav="files">
+ <div class="main">
+  <div class="top"><div><div class="title">Print file</div><div class="subt f0" data-text="where" data-font="f0" data-sample="Local storage"></div></div></div>
+  <div style="display:grid;grid-template-columns:292px 1fr;gap:12px;height:402px">
+   <div class="card" style="display:grid;place-items:center"><div class="thumb" data-thumb="preview" style="width:272px;height:272px"></div></div>
+   <div class="card" style="padding:18px 20px;display:flex;flex-direction:column">
+    <div class="f2" data-text="name1" data-font="f2" style="height:26px" data-sample="Macbook 14 Riser"></div>
+    <div class="f2" data-text="name2" data-font="f2" style="height:26px" data-sample=""></div>
+    <div style="display:grid;gap:12px;margin-top:16px">
+     <div class="row" style="gap:12px"><div class="ico"><i data-icon="clock"></i></div><div><div class="lbl">Print time</div><div class="f1" data-text="time" data-font="f1" style="height:20px;width:220px;margin-top:2px" data-sample="2h 34m"></div></div></div>
+     <div class="row" style="gap:12px"><div class="ico"><i data-icon="weight"></i></div><div><div class="lbl">Filament</div><div class="f1" data-text="filament" data-font="f1" style="height:20px;width:220px;margin-top:2px" data-sample="97 g · PLA"></div></div></div>
+     <div class="row" style="gap:12px"><div class="ico"><i data-icon="layers-2"></i></div><div><div class="lbl">Layers</div><div class="f1" data-text="layers" data-font="f1" style="height:20px;width:220px;margin-top:2px" data-sample="0.20 mm · 240 layers"></div></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:10px;margin-top:auto">
+     <div class="btn" data-hit="back"><i data-icon="chevron-left"></i>Back</div>
+     <div class="btn pri" data-hit="print"><i data-icon="play"></i>Print</div>
+    </div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- MOVE -->
+<section class="screen" id="move" data-nav="move">
+ <div class="main">
+  <div class="top">
+   <div><div class="title">Move</div><div class="subt f0" data-text="position" data-font="f0" data-sample="X 120.0 · Y 120.0 · Z 10.0"></div></div>
+   <div class="chips"><div class="seg"><div data-hit="step1" data-on="step1">1</div><div data-hit="step10" data-on="step10">10</div><div data-hit="step50" data-on="step50">50</div><div data-hit="step100" data-on="step100">100 mm</div></div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:286px 112px 1fr;gap:12px;height:402px">
+   <div class="card" style="padding:14px;display:flex;flex-direction:column;align-items:center">
+    <div class="lbl" style="align-self:flex-start">X / Y</div>
+    <div style="position:relative;width:250px;height:250px;margin-top:22px;border-radius:50%;background:#18202A;border:1px solid var(--line)">
+     <div data-hit="y_plus" style="position:absolute;left:85px;top:6px;width:80px;height:70px;border-radius:16px;display:grid;place-items:center;background:#18202A"><i data-icon="chevron-up" style="width:38px;height:38px"></i></div>
+     <div data-hit="y_minus" style="position:absolute;left:85px;bottom:6px;width:80px;height:70px;border-radius:16px;display:grid;place-items:center;background:#18202A"><i data-icon="chevron-down" style="width:38px;height:38px"></i></div>
+     <div data-hit="x_minus" style="position:absolute;left:6px;top:85px;width:70px;height:80px;border-radius:16px;display:grid;place-items:center;background:#18202A"><i data-icon="chevron-left" style="width:38px;height:38px"></i></div>
+     <div data-hit="x_plus" style="position:absolute;right:6px;top:85px;width:70px;height:80px;border-radius:16px;display:grid;place-items:center;background:#18202A"><i data-icon="chevron-right" style="width:38px;height:38px"></i></div>
+     <div data-hit="home_xy" style="position:absolute;left:93px;top:93px;width:64px;height:64px;border-radius:50%;background:var(--acc);display:grid;place-items:center;color:var(--accInk)"><i data-icon="house" style="width:24px;height:24px"></i></div>
+    </div>
+    <div style="margin-top:auto;font-size:12px;color:var(--mute)">Centre homes X and Y</div>
+   </div>
+   <div class="card" style="padding:14px 12px;display:flex;flex-direction:column;gap:10px">
+    <div class="lbl">Z</div>
+    <div class="btn" data-hit="z_up" style="height:118px;flex-direction:column;gap:4px"><i data-icon="arrow-up" style="width:26px;height:26px"></i><span style="font-size:13px;color:var(--sub)">Z+</span></div>
+    <div class="f2" data-text="z" data-font="f2" data-align="center" style="text-align:center;height:26px" data-sample="10.0"></div>
+    <div class="btn" data-hit="z_down" style="height:118px;flex-direction:column;gap:4px"><i data-icon="arrow-down" style="width:26px;height:26px"></i><span style="font-size:13px;color:var(--sub)">Z−</span></div>
+   </div>
+   <div style="display:flex;flex-direction:column;gap:12px">
+    <div class="card" style="padding:14px">
+     <div class="lbl">Extruder</div>
+     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
+      <div class="btn" data-hit="retract"><i data-icon="arrow-up-from-line"></i>Retract</div>
+      <div class="btn" data-hit="extrude"><i data-icon="arrow-down-to-line"></i>Extrude</div>
+     </div>
+     <div class="f0" data-text="extruder" data-font="f0" style="margin-top:10px;height:16px;color:var(--mute)" data-sample="10 mm · nozzle 220°"></div>
+    </div>
+    <div class="btn pri" data-hit="home_all"><i data-icon="house"></i>Home all</div>
+    <div class="btn" data-hit="filament"><i data-icon="cable"></i>Filament</div>
+    <div class="btn" data-hit="motors_off"><i data-icon="lock-open"></i>Motors off</div>
+    <div class="btn" data-hit="temps"><i data-icon="thermometer"></i>Temperatures</div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- FILAMENT -->
+<section class="screen" id="filament" data-nav="move">
+ <div class="main">
+  <div class="top">
+   <div><div class="title">Filament</div><div class="subt f0" data-text="hint" data-font="f0" data-sample="Pick a material, then unload or load"></div></div>
+   <div class="chips"><div class="chip" data-hit="close" style="height:36px"><i data-icon="x"></i>Close</div></div>
+  </div>
+  <div class="row" style="gap:10px;height:44px">
+   <div class="step" data-on="stage1"><div class="n">1</div>Heat</div>
+   <div style="flex:1;height:2px;background:#2A3542"></div>
+   <div class="step" data-on="stage2"><div class="n">2</div>Unload</div>
+   <div style="flex:1;height:2px;background:#2A3542"></div>
+   <div class="step" data-on="stage3"><div class="n">3</div>Load</div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:10px;height:74px">
+   <div class="card choice" data-hit="mat_pla" data-on="mat_pla" style="padding:12px"><div style="font-size:15px;font-weight:700">PLA</div><div style="font-size:13px;color:var(--sub);margin-top:4px">220°</div></div>
+   <div class="card choice" data-hit="mat_petg" data-on="mat_petg" style="padding:12px"><div style="font-size:15px;font-weight:700">PETG</div><div style="font-size:13px;color:var(--sub);margin-top:4px">250°</div></div>
+   <div class="card choice" data-hit="mat_abs" data-on="mat_abs" style="padding:12px"><div style="font-size:15px;font-weight:700">ABS / ASA</div><div style="font-size:13px;color:var(--sub);margin-top:4px">260°</div></div>
+   <div class="card choice" data-hit="mat_pa" data-on="mat_pa" style="padding:12px"><div style="font-size:15px;font-weight:700">PA / PC</div><div style="font-size:13px;color:var(--sub);margin-top:4px">300°</div></div>
+   <div class="card choice" data-hit="mat_custom" data-on="mat_custom" style="padding:12px"><div style="font-size:15px;font-weight:700">Custom</div><div class="f0" data-text="custom" data-font="f0" data-on-text="mat_custom" style="margin-top:4px;height:16px;width:90px;color:var(--sub)" data-sample="230°"></div></div>
+  </div>
+  <div class="card" style="margin-top:12px;height:150px;padding:18px 20px;display:flex;gap:22px;align-items:center">
+   <div style="width:150px">
+    <div class="f3" data-text="temp" data-font="f3" style="height:42px;width:150px" data-sample="186°"></div>
+    <div class="f0" data-text="target" data-font="f0" style="height:16px;width:150px;color:var(--sub);margin-top:2px" data-sample="of 250°"></div>
+    <div class="bar" data-bar="heat" data-fill="#FBBF24" data-sample="74" style="margin-top:12px"></div>
+   </div>
+   <div style="flex:1">
+    <div class="f1" data-text="status" data-font="f1" style="height:20px" data-sample="Heating the nozzle"></div>
+    <div class="f0" data-text="detail1" data-font="f0" style="height:18px;margin-top:8px;color:var(--sub)" data-sample="Unload cuts the filament and pulls it back."></div>
+    <div class="f0" data-text="detail2" data-font="f0" style="height:18px;margin-top:2px;color:var(--sub)" data-sample="Load pushes filament until it leaves the nozzle."></div>
+   </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+   <div class="btn" data-hit="unload" style="height:60px"><i data-icon="arrow-up-from-line"></i>Unload</div>
+   <div class="btn pri" data-hit="load" style="height:60px"><i data-icon="arrow-down-to-line"></i>Load</div>
+  </div>
+ </div>
+</section>
+
+<!-- TEMPERATURES AND FANS -->
+<section class="screen" id="temps" data-nav="move">
+ <div class="main">
+  <div class="top"><div><div class="title">Temperatures</div><div class="subt f0">Tap a target to change it</div></div>
+   <div class="chips"><div class="chip" data-hit="close" style="height:36px"><i data-icon="x"></i>Close</div></div></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+   <div class="card">
+    <div class="lbl" style="padding:12px 14px 10px">Heaters</div>
+    <div class="list-row"><div class="ico amb"><i data-icon="flame"></i></div><div><div class="t">Nozzle</div><div class="f0 s" data-text="nozzle" data-font="f0" style="width:90px" data-sample="186°"></div></div>
+     <div class="end"><div class="btn" data-hit="set_nozzle" style="height:38px;width:92px;font-size:14px"><span class="f1" data-text="nozzle_target" data-font="f1" data-align="center" style="width:70px;height:20px;text-align:center" data-sample="220°"></span></div><div class="btn" data-hit="off_nozzle" style="height:38px;width:52px;font-size:13px;color:var(--sub)">Off</div></div></div>
+    <div class="list-row"><div class="ico acc"><i data-icon="square-dashed"></i></div><div><div class="t">Bed</div><div class="f0 s" data-text="bed" data-font="f0" style="width:90px" data-sample="60°"></div></div>
+     <div class="end"><div class="btn" data-hit="set_bed" style="height:38px;width:92px;font-size:14px"><span class="f1" data-text="bed_target" data-font="f1" data-align="center" style="width:70px;height:20px;text-align:center" data-sample="60°"></span></div><div class="btn" data-hit="off_bed" style="height:38px;width:52px;font-size:13px;color:var(--sub)">Off</div></div></div>
+    <div class="list-row"><div class="ico"><i data-icon="box"></i></div><div><div class="t">Chamber</div><div class="f0 s" data-text="chamber" data-font="f0" style="width:90px" data-sample="31°"></div></div>
+     <div class="end"><div class="btn" data-hit="set_chamber" style="height:38px;width:92px;font-size:14px"><span class="f1" data-text="chamber_target" data-font="f1" data-align="center" style="width:70px;height:20px;text-align:center" data-sample="off"></span></div><div class="btn" data-hit="off_chamber" style="height:38px;width:52px;font-size:13px;color:var(--sub)">Off</div></div></div>
+   </div>
+   <div class="card">
+    <div class="lbl" style="padding:12px 14px 10px">Fans</div>
+    <div class="list-row"><div class="ico blu"><i data-icon="fan"></i></div><div class="t">Part</div>
+     <div class="end"><div class="btn" data-hit="fan0_down" style="height:38px;width:44px"><i data-icon="minus"></i></div><span class="f1" data-text="fan0" data-font="f1" data-align="center" style="width:52px;height:20px;text-align:center;color:var(--text)" data-sample="0%"></span><div class="btn" data-hit="fan0_up" style="height:38px;width:44px"><i data-icon="plus"></i></div></div></div>
+    <div class="list-row"><div class="ico blu"><i data-icon="fan"></i></div><div class="t">Aux</div>
+     <div class="end"><div class="btn" data-hit="fan1_down" style="height:38px;width:44px"><i data-icon="minus"></i></div><span class="f1" data-text="fan1" data-font="f1" data-align="center" style="width:52px;height:20px;text-align:center;color:var(--text)" data-sample="0%"></span><div class="btn" data-hit="fan1_up" style="height:38px;width:44px"><i data-icon="plus"></i></div></div></div>
+    <div class="list-row"><div class="ico blu"><i data-icon="fan"></i></div><div class="t">Exhaust</div>
+     <div class="end"><div class="btn" data-hit="fan2_down" style="height:38px;width:44px"><i data-icon="minus"></i></div><span class="f1" data-text="fan2" data-font="f1" data-align="center" style="width:52px;height:20px;text-align:center;color:var(--text)" data-sample="30%"></span><div class="btn" data-hit="fan2_up" style="height:38px;width:44px"><i data-icon="plus"></i></div></div></div>
+   </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:12px">
+   <div class="btn" data-hit="pre_pla">PLA 220 / 60</div>
+   <div class="btn" data-hit="pre_petg">PETG 250 / 70</div>
+   <div class="btn" data-hit="pre_abs">ABS 260 / 100</div>
+   <div class="btn dan" data-hit="cooldown"><i data-icon="power"></i>All off</div>
+  </div>
+ </div>
+</section>
+
+<!-- TOOLS -->
+<section class="screen" id="tools" data-nav="tools">
+ <div class="main">
+  <div class="top"><div><div class="title">Tools</div><div class="subt f0">Calibrations use QIDI's own macros</div></div></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;height:250px">
+   <div class="card" data-hit="level" style="padding:20px;display:flex;flex-direction:column">
+    <div class="ico acc" style="width:48px;height:48px;border-radius:14px"><i data-icon="grid-3x3" style="width:26px;height:26px"></i></div>
+    <div style="font-size:20px;font-weight:700;margin-top:auto">Auto bed levelling</div>
+    <div style="font-size:13px;color:var(--sub);margin-top:6px;line-height:1.45">Heats the bed, cleans the nozzle and probes a new bed mesh. About 10 minutes.</div>
+   </div>
+   <div class="card" data-hit="shaper" style="padding:20px;display:flex;flex-direction:column">
+    <div class="ico blu" style="width:48px;height:48px;border-radius:14px"><i data-icon="audio-waveform" style="width:26px;height:26px"></i></div>
+    <div style="font-size:20px;font-weight:700;margin-top:auto">Input shaping</div>
+    <div style="font-size:13px;color:var(--sub);margin-top:6px;line-height:1.45">Measures resonances on X and Y and saves the best shaper. About 5 minutes.</div>
+   </div>
+  </div>
+  <div class="card" style="margin-top:12px;padding:16px 18px;display:flex;gap:14px;align-items:center">
+   <div class="ico amb"><i data-icon="triangle-alert"></i></div>
+   <div style="font-size:13px;color:var(--sub);line-height:1.5">Both end with SAVE_CONFIG, which restarts Klipper. The screen waits for it and shows the result. Bed screw adjustment is in Fluidd.</div>
+  </div>
+ </div>
+</section>
+
+<!-- CALIBRATION PROGRESS -->
+<section class="screen" id="tool_run" data-nav="tools">
+ <div class="main">
+  <div class="top"><div><div class="f2" data-text="title" data-font="f2" style="height:26px;width:400px" data-sample="Auto bed levelling"></div><div class="subt f0" data-text="subtitle" data-font="f0" data-sample="Bed target 60°"></div></div></div>
+  <div class="card" style="padding:6px 0">
+   <div class="list-row" style="border-top:0"><div class="step" data-on="done1"><div class="n">1</div></div><span class="f1" data-text="step1" data-font="f1" style="width:520px;height:20px" data-sample="Homing and heating"></span></div>
+   <div class="list-row"><div class="step" data-on="done2"><div class="n">2</div></div><span class="f1" data-text="step2" data-font="f1" style="width:520px;height:20px" data-sample="Cleaning the nozzle"></span></div>
+   <div class="list-row"><div class="step" data-on="done3"><div class="n">3</div></div><span class="f1" data-text="step3" data-font="f1" style="width:520px;height:20px" data-sample="Cooling the nozzle"></span></div>
+   <div class="list-row" style="border-radius:0 0 18px 18px"><div class="step" data-on="done4"><div class="n">4</div></div><span class="f1" data-text="step4" data-font="f1" style="width:520px;height:20px" data-sample="Probing the bed mesh"></span></div>
+  </div>
+  <div class="card" style="margin-top:12px;padding:16px 18px">
+   <div class="f1" data-text="status" data-font="f1" style="height:20px" data-sample="Running"></div>
+   <div class="f0" data-text="detail" data-font="f0" style="height:16px;margin-top:6px;color:var(--sub)" data-sample="Started 17:24 · 3 min"></div>
+  </div>
+  <div class="btn" data-hit="back" style="margin-top:12px;width:200px"><i data-icon="chevron-left"></i>Back</div>
+ </div>
+</section>
+
+<!-- SETTINGS -->
+<section class="screen" id="settings" data-nav="settings">
+ <div class="main">
+  <div class="top"><div><div class="title">Settings</div><div class="subt f0" data-text="versions" data-font="f0" data-sample="plus4screen 0.2 · Klipper v0.12.0-65"></div></div></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+   <div style="display:flex;flex-direction:column;gap:12px">
+    <div class="card"><div class="lbl" style="padding:12px 14px 10px">Network</div>
+     <div class="list-row" data-hit="wifi"><div class="ico acc"><i data-icon="wifi"></i></div><div><div class="t">Wi-Fi</div><div class="f0 s" data-text="wifi" data-font="f0" style="width:200px" data-sample="Home · 192.168.86.210"></div></div><div class="end"><i data-icon="chevron-right"></i></div></div>
+     <div class="list-row"><div class="ico"><i data-icon="globe"></i></div><div><div class="t">Fluidd</div><div class="f0 s" data-text="url" data-font="f0" style="width:200px" data-sample="http://192.168.86.210"></div></div></div>
+    </div>
+    <div class="card"><div class="lbl" style="padding:12px 14px 10px">Display</div>
+     <div class="list-row"><div class="ico"><i data-icon="sun"></i></div><div class="t">Brightness</div><div class="end"><div class="btn" data-hit="bright_down" style="height:36px;width:40px"><i data-icon="minus"></i></div><span class="f1" data-text="brightness" data-font="f1" data-align="center" style="width:52px;height:20px;text-align:center;color:var(--text)" data-sample="80%"></span><div class="btn" data-hit="bright_up" style="height:36px;width:40px"><i data-icon="plus"></i></div></div></div>
+     <div class="list-row" data-hit="sleep"><div class="ico"><i data-icon="moon"></i></div><div><div class="t">Screen off after</div><div class="f0 s" data-text="sleep" data-font="f0" style="width:200px" data-sample="5 minutes"></div></div><div class="end"><i data-icon="chevron-right"></i></div></div>
+    </div>
+   </div>
+   <div style="display:flex;flex-direction:column;gap:12px">
+    <div class="card"><div class="lbl" style="padding:12px 14px 10px">Printer</div>
+     <div class="list-row"><div class="ico"><i data-icon="cpu"></i></div><div><div class="t">Klipper</div><div class="f0 s" data-text="klipper" data-font="f0" style="width:200px" data-sample="Ready"></div></div><div class="end"><span data-dot="klipper_dot" style="width:8px;height:8px;border-radius:50%;background:var(--acc)"></span></div></div>
+     <div class="list-row" data-hit="restart_klipper"><div class="ico"><i data-icon="refresh-cw"></i></div><div><div class="t">Restart Klipper</div><div class="s">Reload printer.cfg</div></div><div class="end"><i data-icon="chevron-right"></i></div></div>
+     <div class="list-row" data-hit="restart_firmware"><div class="ico"><i data-icon="zap"></i></div><div><div class="t">Firmware restart</div><div class="s">Reset the MCUs</div></div><div class="end"><i data-icon="chevron-right"></i></div></div>
+     <div class="list-row" data-hit="about"><div class="ico"><i data-icon="info"></i></div><div><div class="t">About</div><div class="s">Versions and licences</div></div><div class="end"><i data-icon="chevron-right"></i></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+     <div class="btn" data-hit="reboot"><i data-icon="rotate-cw"></i>Restart</div>
+     <div class="btn dan" data-hit="shutdown"><i data-icon="power"></i>Shut down</div>
+    </div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- ABOUT -->
+<section class="screen" id="about" data-nav="settings">
+ <div class="main">
+  <div class="top"><div><div class="title">About</div><div class="subt f0">Open-source screen program for the QIDI Plus4</div></div>
+   <div class="chips"><div class="chip" data-hit="close" style="height:36px"><i data-icon="chevron-left"></i>Back</div></div></div>
+  <div class="card"><div class="lbl" style="padding:12px 14px 10px">Versions</div>
+   <div class="list-row"><div class="t" style="width:200px">plus4screen</div><span class="f0" data-text="v_screen" data-font="f0" style="width:420px;height:16px;color:var(--sub)" data-sample="0.2.0"></span></div>
+   <div class="list-row"><div class="t" style="width:200px">Klipper</div><span class="f0" data-text="v_klipper" data-font="f0" style="width:420px;height:16px;color:var(--sub)" data-sample="v0.12.0-65"></span></div>
+   <div class="list-row"><div class="t" style="width:200px">Moonraker</div><span class="f0" data-text="v_moonraker" data-font="f0" style="width:420px;height:16px;color:var(--sub)" data-sample="v0.8.0-379"></span></div>
+   <div class="list-row"><div class="t" style="width:200px">Main board MCU</div><span class="f0" data-text="v_mcu" data-font="f0" style="width:420px;height:16px;color:var(--sub)" data-sample="v0.12.0-65"></span></div>
+   <div class="list-row"><div class="t" style="width:200px">Toolhead MCU</div><span class="f0" data-text="v_mcu_th" data-font="f0" style="width:420px;height:16px;color:var(--sub)" data-sample="v0.12.0-65"></span></div>
+   <div class="list-row"><div class="t" style="width:200px">Host</div><span class="f0" data-text="v_host" data-font="f0" style="width:420px;height:16px;color:var(--sub)" data-sample="Debian 10 · Python 3.7.3"></span></div>
+  </div>
+  <div style="margin-top:12px;font-size:12px;color:var(--mute);line-height:1.6">Inter font: SIL Open Font License 1.1. Lucide icons: ISC License.<br>plus4screen is part of a fork of QIDITECH/QIDI_PLUS4 (GPL-3.0).</div>
+ </div>
+</section>
+
+<!-- KEYPAD -->
+<section class="screen" id="keypad">
+ <div class="dialog" style="left:150px;top:24px;width:500px;height:432px;padding:20px">
+  <div class="row"><div><div class="f1" data-text="title" data-font="f1" style="height:20px;width:300px" data-sample="Nozzle temperature"></div><div class="f0" data-text="hint" data-font="f0" style="height:16px;width:300px;margin-top:3px;color:var(--sub)" data-sample="0 to 300 °C"></div></div></div>
+  <div class="row" style="margin-top:14px;height:64px;border-radius:14px;background:var(--bg);border:1px solid var(--line);padding:0 18px">
+   <span class="f3" data-text="value" data-font="f3" data-align="right" style="margin-left:auto;width:400px;height:42px;text-align:right" data-sample="220"></span>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px">
+   <div class="key" data-hit="k1">1</div><div class="key" data-hit="k2">2</div><div class="key" data-hit="k3">3</div><div class="key" data-hit="kback"><i data-icon="delete"></i></div>
+   <div class="key" data-hit="k4">4</div><div class="key" data-hit="k5">5</div><div class="key" data-hit="k6">6</div><div class="key" data-hit="ksign" style="font-size:20px">±</div>
+   <div class="key" data-hit="k7">7</div><div class="key" data-hit="k8">8</div><div class="key" data-hit="k9">9</div><div class="key" data-hit="kdot">.</div>
+   <div class="key" data-hit="cancel" style="font-size:15px;color:var(--sub)">Cancel</div><div class="key" data-hit="k0">0</div>
+   <div class="key" data-hit="ok" style="grid-column:span 2;background:var(--acc);border-color:var(--acc);color:var(--accInk);font-size:17px">OK</div>
+  </div>
+ </div>
+</section>
+
+<!-- CONFIRM -->
+<section class="screen" id="confirm">
+ <div class="dialog" style="left:170px;top:110px;width:460px;height:260px;padding:24px">
+  <div class="row" style="gap:12px"><div class="ico amb" style="width:40px;height:40px;border-radius:12px"><i data-icon="triangle-alert" style="width:22px;height:22px"></i></div>
+   <div class="f2" data-text="title" data-font="f2" style="height:26px;width:340px" data-sample="Restart the printer?"></div></div>
+  <div class="f0" data-text="body1" data-font="f0" style="margin-top:18px;height:18px;color:var(--sub)" data-sample="Klipper, Moonraker and the screen restart."></div>
+  <div class="f0" data-text="body2" data-font="f0" style="margin-top:4px;height:18px;color:var(--sub)" data-sample="This takes about a minute."></div>
+  <div style="position:absolute;left:24px;right:24px;bottom:24px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+   <div class="btn" data-hit="no">Cancel</div>
+   <div class="btn pri" data-hit="yes"><span class="f1" data-text="yes" data-font="f1" data-align="center" style="width:180px;height:20px;text-align:center;color:var(--accInk)" data-sample="Restart"></span></div>
+  </div>
+ </div>
+</section>
+
+<!-- MESSAGE -->
+<section class="screen" id="message">
+ <div class="dialog" style="left:170px;top:110px;width:460px;height:260px;padding:24px">
+  <div class="row" style="gap:12px"><div class="ico" style="width:40px;height:40px;border-radius:12px;background:rgba(244,63,94,.14);color:var(--red)"><i data-icon="circle-x" style="width:22px;height:22px"></i></div>
+   <div class="f2" data-text="title" data-font="f2" style="height:26px;width:340px" data-sample="Cannot do that now"></div></div>
+  <div class="f0" data-text="body1" data-font="f0" style="margin-top:18px;height:18px;color:var(--sub)" data-sample="Stop the print first."></div>
+  <div class="f0" data-text="body2" data-font="f0" style="margin-top:4px;height:18px;color:var(--sub)" data-sample=""></div>
+  <div class="f0" data-text="body3" data-font="f0" style="margin-top:4px;height:18px;color:var(--sub)" data-sample=""></div>
+  <div style="position:absolute;left:24px;right:24px;bottom:24px"><div class="btn pri" data-hit="ok">OK</div></div>
+ </div>
+</section>
+
+<script>
+// File cards are identical; generate the six of them.
+document.getElementById('file-grid').innerHTML = [0, 1, 2, 3, 4, 5].map(i => `
+  <div class="card" data-hit="file${i}" style="padding:10px;display:flex;flex-direction:column">
+   <div class="thumb" style="height:96px;display:grid;place-items:center"><div data-thumb="file${i}" style="width:96px;height:96px"></div></div>
+   <div class="f1" data-text="name${i}" data-font="f1" style="margin-top:8px;height:20px" data-sample="Macbook 14 Riser"></div>
+   <div class="f0" data-text="meta${i}" data-font="f0" style="margin-top:2px;height:16px;color:var(--sub)" data-sample="2h 34m · 97 g · PLA"></div>
+  </div>`).join('');
+</script>
+<script src="ui.js"></script>
+<style>
+.when-on { display: none !important; }
+.on > .when-on, .on .when-on { display: inline-flex !important; }
+.on > .when-off, .on .when-off { display: none !important; }
+.lightbtn.on { color: var(--amber) !important; border-color: rgba(251, 191, 36, .45); background: #221E12; }
+.pause.on { border-color: #1F5C55; }
+</style>
+</body></html>
