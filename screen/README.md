@@ -36,8 +36,8 @@ Use Fluidd (or the stock program) for these:
 These are the parts **not verified** on hardware. The code keeps each one in a single place in [`plus4screen/pages.py`](plus4screen/pages.py), so it is easy to fix:
 
 - which picture shows "paused" and "light on" (`TOGGLE_PICC`)
-- the direction of the Z arrows (`W_JOG`; `Z↑` sends `Z+`)
-- the extruder arrows (`W_EXTRUDER`; down extrudes)
+
+The jog and extruder directions (`W_JOG`, `W_EXTRUDER`) follow what stock `xindi` sends for the same widgets (18 = Z−, 19 = Z+, 20 = retract, 21 = extrude). They are checked against `xindi`, not yet on a printer.
 
 ## How it works
 

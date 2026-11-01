@@ -47,8 +47,11 @@ STEP_PICC = (114, 116)                    # picc (normal, selected)
 W_HOME = 10
 W_MOTORS_OFF = 11
 W_FILAMENT = 13          # stock: QIDI Box page; here: single-spool flow
+# Directions match xindi: 14 move_y_increase, 15 move_y_decrease,
+# 16 move_x_decrease, 17 move_x_increase, 18 move_z_decrease (Z-),
+# 19 move_z_increase (Z+), 20 start_retract, 21 start_extrude.
 W_JOG = {14: ("Y", 1), 15: ("Y", -1), 16: ("X", -1), 17: ("X", 1),
-         18: ("Z", 1), 19: ("Z", -1)}
+         18: ("Z", -1), 19: ("Z", 1)}
 W_EXTRUDER = {20: -1, 21: 1}   # up arrow retracts, down arrow extrudes
 
 # CONTROL_KB (page 36). OK sends the typed value as a 0x71 frame

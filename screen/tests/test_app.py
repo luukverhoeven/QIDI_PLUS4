@@ -156,11 +156,11 @@ class AppTest(unittest.TestCase):
         self.touch(P.CONTROL, 9)            # 100 mm
         self.assertIn("b9.picc=116", self.sent())
         self.touch(P.CONTROL, 16)           # X-
-        self.touch(P.CONTROL, 18)           # Z up
+        self.touch(P.CONTROL, 18)           # Z- (xindi move_z_decrease)
         self.touch(P.CONTROL, 21)           # extrude
         self.assertEqual(self.run_gcode(), [
             "G91\nG1 X-100 F6000\nG90",
-            "G91\nG1 Z100 F600\nG90",
+            "G91\nG1 Z-100 F600\nG90",
             "G91\nG1 E100 F300\nG90"])
 
     def test_no_movement_while_printing(self):
