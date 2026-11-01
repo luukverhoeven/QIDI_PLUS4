@@ -46,7 +46,11 @@ W_FANS = 22             # b22, opens CONTROL_SETFAN
 
 # CONTROL (page 35)
 W_STEP = {6: 1, 7: 10, 8: 50, 9: 100}   # widget -> mm
-STEP_PICC = (114, 116)                    # picc (normal, selected)
+# (picc, picc2) as xindi draws them (FUN_0070a008).
+STEP_PICC = ((114, 116), (115, 115))     # normal, selected
+HEATER_PICC = ((114, 116), (115, 118))   # b0-b2: idle, heating
+CONTROL_ARROWS = ("b20", "b21")          # extruder arrows: (114, 116)
+CONTROL_LABELS = ("b12", "b13")          # pco white
 W_HOME = 10
 W_MOTORS_OFF = 11
 W_FILAMENT = 13          # stock: QIDI Box page; here: single-spool flow

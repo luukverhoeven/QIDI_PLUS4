@@ -89,8 +89,10 @@ class LayoutTest(unittest.TestCase):
 
     def test_selection_pictures(self):
         control = self.objects(P.CONTROL)
+        # The layout default is the unselected look; picc2 is the
+        # pressed picture, not the selected one.
         self.assertEqual((control["b6"]["picc"], control["b6"]["picc2"]),
-                         P.STEP_PICC)
+                         P.STEP_PICC[0])
         heat = self.objects(P.PRE_HEAT)
         self.assertEqual(heat["b7"]["picc"], P.TEMP_PICC[0])
         self.assertEqual(heat["b6"]["picc"], P.TEMP_PICC[1])

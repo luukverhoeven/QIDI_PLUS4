@@ -181,7 +181,10 @@ class AppTest(unittest.TestCase):
         self.touch(P.MAIN, P.NAV_CONTROL)
         self.sent()
         self.touch(P.CONTROL, 9)            # 100 mm
-        self.assertIn("b9.picc=116", self.sent())
+        cmds = self.sent()
+        self.assertIn("b9.picc=115", cmds)
+        self.assertIn("b9.picc2=115", cmds)
+        self.assertIn("b7.picc=114", cmds)
         self.touch(P.CONTROL, 16)           # X-
         self.touch(P.CONTROL, 18)           # Z- (xindi move_z_decrease)
         self.touch(P.CONTROL, 21)           # extrude

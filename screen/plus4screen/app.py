@@ -374,12 +374,19 @@ class App(SettingsMixin, ToolsMixin, PicturesMixin):
     # Page: CONTROL --------------------------------------------------------
 
     def enter_control(self):
+        # Draw the page the way xindi does when nothing is running.
+        for obj in P.CONTROL_ARROWS:
+            self.set_attr(obj, "picc", 114)
+            self.set_attr(obj, "picc2", 116)
+        for obj in P.CONTROL_LABELS:
+            self.set_attr(obj, "pco", P.WHITE)
         self.show_step()
 
     def show_step(self):
         for widget, mm in P.W_STEP.items():
-            self.set_attr("b%d" % widget, "picc",
-                          P.STEP_PICC[1 if mm == self.step else 0])
+            picc, picc2 = P.STEP_PICC[1 if mm == self.step else 0]
+            self.set_attr("b%d" % widget, "picc", picc)
+            self.set_attr("b%d" % widget, "picc2", picc2)
 
     def touch_control(self, widget):
         if self.control_column(widget):
@@ -686,6 +693,11 @@ class App(SettingsMixin, ToolsMixin, PicturesMixin):
                 self.set_val("n%d" % i, s.temps[i][0])
                 self.set_val("n%d" % (i + 3), s.temps[i][1])
                 self.set_val("n%d" % (i + 6), s.fans[i])
+                heating = s.temps[i][1] >= 1
+                picc, picc2 = P.HEATER_PICC[1 if heating else 0]
+                self.set_attr("b%d" % i, "picc", picc)
+                self.set_attr("b%d" % i, "picc2", picc2)
+                self.set_attr("n%d" % i, "pco", P.RED if heating else P.WHITE)
                 if page == P.CONTROL_SETFAN:
                     self.set_val("h%d" % i, s.fans[i])
         elif page == P.PRINTING:
