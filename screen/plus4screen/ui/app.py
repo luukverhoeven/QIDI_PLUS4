@@ -22,6 +22,7 @@ log = logging.getLogger("plus4screen")
 
 PREFS_PATH = os.path.expanduser("~/.config/plus4screen.json")
 DEFAULT_PREFS = {"brightness": 80, "sleep_minutes": 5}
+PREF_RANGE = {"brightness": (10, 100), "sleep_minutes": (0, 240)}
 NET_REFRESH = 30.0           # s between network look-ups
 NAV = {"nav_home": "home", "nav_files": "files", "nav_move": "move",
        "nav_tools": "tools", "nav_settings": "settings"}
@@ -34,10 +35,13 @@ class Prefs(dict):
         self.path = path
         try:
             with open(path, encoding="utf-8") as f:
-                self.update({k: v for k, v in json.load(f).items()
-                             if k in DEFAULT_PREFS})
+                saved = json.load(f)
         except (OSError, ValueError):
-            pass
+            saved = {}
+        for key, (low, high) in PREF_RANGE.items():
+            value = saved.get(key) if isinstance(saved, dict) else None
+            if isinstance(value, int) and not isinstance(value, bool):
+                self[key] = max(low, min(high, value))
 
     def save(self):
         try:
@@ -66,6 +70,9 @@ class UIApp:
         self.current = None
         self.modal_return = None
         self.touch_hit = None
+        # Does the screen have the screen file ui_layout.json describes?
+        # None until it answered "get sys2"; no id in the layout: no check.
+        self.screen_ok = None if self.canvas.layout.screen_id else True
         self.last_touch = clock()
         self.asleep = False
         self.swallow = False
@@ -86,6 +93,8 @@ class UIApp:
         self.send("bkcmd=2")      # report failed commands only
         self.send("sendxy=1")
         self.send("dim=%d" % self.prefs["brightness"])
+        if self.canvas.layout.screen_id:
+            self.send("get sys2")
         self.asleep = False
         self.show(self.home_screen())
 
@@ -160,6 +169,30 @@ class UIApp:
                 self.screens[self.current].refresh(self.state)
         self.runner.spawn(lambda: self.mr.metadata(filename), done)
         return None
+
+    def forget_changed_metadata(self, files):
+        """Drop metadata of files that changed since it was read."""
+        for entry in files:
+            meta = self.meta.get(entry.get("path"))
+            if meta and meta.get("modified") not in (None,
+                                                     entry.get("modified")):
+                del self.meta[entry["path"]]
+
+    def motion_reason(self):
+        """Why the axes, extruder and heaters must not be touched now."""
+        s = self.state
+        if s.busy_printing:
+            return "Pause or stop the print first."
+        if self.screens["filament"].running or self.screens["tool_run"].running:
+            return "Wait for the running job to finish."
+        return None
+
+    def refuse_motion(self):
+        """Show why motion is blocked; True when it is."""
+        reason = self.motion_reason()
+        if reason:
+            self.message("Not now", reason)
+        return bool(reason)
 
     def busy_reason(self):
         s = self.state
@@ -243,6 +276,8 @@ class UIApp:
     def handle(self, event):
         if event.kind == tjc.XY:
             self.on_touch(*event.value)
+        elif event.kind == tjc.NUMBER and self.screen_ok is None:
+            self.check_screen(event.value)
         elif event.kind == tjc.BOOT:
             log.info("screen booted")
             self.start()
@@ -250,13 +285,31 @@ class UIApp:
             level = logging.DEBUG if event.value == 0x01 else logging.INFO
             log.log(level, "screen status 0x%02x", event.value)
 
+    def check_screen(self, value):
+        expected = self.canvas.layout.screen_id
+        self.screen_ok = value == expected
+        if self.screen_ok:
+            log.info("screen file matches (id %d)", value)
+        else:
+            log.error("the screen file does not match ui_layout.json (screen "
+                      "says %d, expected %d): touches are ignored. Write "
+                      "ui/build/plus4ui.tft with python3 -m plus4screen.flash",
+                      value, expected)
+
     def on_touch(self, x, y, pressed):
+        if not self.screen_ok:
+            if pressed:
+                log.warning("touch ignored: screen file not confirmed")
+            return
         self.last_touch = self.clock()
         if self.asleep:
-            if pressed:
-                self.wake()
+            if not pressed:
+                return
+            self.wake()
+            hit = self.canvas.screen and self.canvas.screen.hit_at(x, y)
+            if not (hit and hit.id == "estop"):
                 self.swallow = True       # the waking touch does nothing
-            return
+                return
         if self.swallow:
             if not pressed:
                 self.swallow = False
@@ -265,14 +318,16 @@ class UIApp:
             return
         hit = self.canvas.screen.hit_at(x, y)
         if pressed:
-            self.touch_hit = hit.id if hit else None
+            self.touch_hit = (self.current, hit.id) if hit else None
             if hit:
                 self.canvas.press(hit.id)
             return
         self.canvas.release()
         target, self.touch_hit = self.touch_hit, None
-        if hit is None or hit.id != target:
+        # Only a release on the same button of the same screen counts.
+        if hit is None or target != (self.current, hit.id):
             return
+        target = hit.id
         log.info("touch %s.%s", self.current, target)
         self.on_hit(target)
 

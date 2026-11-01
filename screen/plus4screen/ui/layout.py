@@ -86,6 +86,7 @@ class Screen:
 class Layout:
     def __init__(self, data):
         self.size = tuple(data["size"])
+        self.screen_id = data.get("screen_id")
         self.screens = {name: Screen(name, d)
                         for name, d in data["screens"].items()}
 

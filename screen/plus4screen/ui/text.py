@@ -56,6 +56,14 @@ def lines(text, room, count):
             for line in out]
 
 
+def first_line(*texts):
+    """The first line of the first non-empty text, or ""."""
+    for text in texts:
+        if text and text.strip():
+            return text.strip().splitlines()[0]
+    return ""
+
+
 def duration(seconds):
     if not seconds or seconds < 0:
         return "-"

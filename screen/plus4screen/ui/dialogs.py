@@ -39,13 +39,15 @@ class Keypad(Screen):
         if hit_id.startswith("k") and hit_id[1:].isdigit():
             self.type(hit_id[1:])
         elif hit_id == "kdot":
-            if self.decimals and "." not in self.entry:
-                self.type("." if self.entry and not self.fresh else "0.")
+            if self.decimals:
+                self.type(".")
         elif hit_id == "ksign":
             if self.negative:
-                self.fresh = False
-                self.entry = self.entry[1:] if self.entry.startswith("-") \
-                    else "-" + self.entry
+                if self.fresh:          # start a new negative number
+                    self.entry, self.fresh = "-", False
+                else:
+                    self.entry = self.entry[1:] if self.entry.startswith(
+                        "-") else "-" + self.entry
                 self.draw()
         elif hit_id == "kback":
             self.fresh = False
@@ -56,17 +58,22 @@ class Keypad(Screen):
         elif hit_id == "ok":
             self.accept()
 
-    def type(self, chars):
+    def type(self, char):
         if self.fresh:
-            self.entry = "-" if self.entry.startswith("-") and \
-                self.negative and chars != "0." else ""
-            self.fresh = False
-        if len(self.entry.replace("-", "").replace(".", "")) >= MAX_DIGITS:
+            # The first key starts a new number: nothing of the shown
+            # value (sign, decimals) is kept.
+            self.entry, self.fresh = "", False
+        if char == ".":
+            if "." in self.entry:
+                return
+            if self.entry in ("", "-"):
+                char = "0."
+        elif "." in self.entry and \
+                len(self.entry.split(".")[1]) >= self.decimals:
             return
-        if "." in self.entry and len(self.entry.split(".")[1]) >= \
-                self.decimals and chars != ".":
+        elif len(self.entry.replace("-", "").replace(".", "")) >= MAX_DIGITS:
             return
-        self.entry += chars
+        self.entry += char
         self.draw()
 
     def accept(self):

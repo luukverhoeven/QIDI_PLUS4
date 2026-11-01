@@ -72,6 +72,21 @@ class SyncRunner:
             on_done(result, error)
 
 
+class DeferredRunner(SyncRunner):
+    """Keeps calls until run_all(), like the threads on the printer."""
+
+    def __init__(self):
+        self.pending = []
+
+    def spawn(self, fn, on_done=None):
+        self.pending.append((fn, on_done))
+
+    def run_all(self):
+        while self.pending:
+            fn, on_done = self.pending.pop(0)
+            SyncRunner.spawn(self, fn, on_done)
+
+
 class UITest(unittest.TestCase):
     def setUp(self):
         self.sent = []
@@ -226,6 +241,160 @@ class UITest(unittest.TestCase):
         self.assertEqual(self.mr.scripts, [])
         self.tap("home_all")
         self.assertEqual(self.mr.scripts, ["G28"])
+
+
+    # Review findings ------------------------------------------------------
+
+    def printing(self):
+        self.mr.status = status(print_stats={"state": "printing",
+                                             "filename": "a.gcode"})
+        self.app.poll()
+
+    def test_dot_first_starts_a_new_number(self):
+        self.mr.status = status(gcode_move={"homing_origin": [0, 0, -0.05,
+                                                              0]})
+        self.app.poll()
+        self.app.show("printing")
+        self.tap("set_zoffset")
+        for key in ("kdot", "k1", "ok"):
+            self.tap(key)
+        self.assertEqual(self.app.current, "printing")
+        self.assertEqual(self.mr.scripts,
+                         ["SET_GCODE_OFFSET Z=0.100 MOVE=1"])
+
+    def test_first_digit_drops_the_old_sign(self):
+        self.mr.status = status(gcode_move={"homing_origin": [0, 0, -0.05,
+                                                              0]})
+        self.app.poll()
+        self.app.show("printing")
+        self.tap("set_zoffset")
+        for key in ("k0", "kdot", "k1", "ok"):
+            self.tap(key)
+        self.assertEqual(self.mr.scripts,
+                         ["SET_GCODE_OFFSET Z=0.100 MOVE=1"])
+
+    def test_big_z_offset_change_asks_first(self):
+        self.app.show("printing")
+        self.tap("set_zoffset")
+        for key in ("k1", "ok"):
+            self.tap(key)
+        self.assertEqual(self.app.current, "confirm")
+        self.assertEqual(self.mr.scripts, [])
+        self.tap("yes")
+        self.assertEqual(self.mr.scripts,
+                         ["SET_GCODE_OFFSET Z=1.000 MOVE=1"])
+
+    def test_no_motion_while_printing(self):
+        self.printing()
+        self.app.show("move")
+        for hit in ("home_all", "home_xy", "motors_off", "y_plus",
+                    "extrude"):
+            self.tap(hit)
+            self.assertEqual(self.app.current, "message", hit)
+            self.app.close_modal()
+        self.app.show("home")
+        for hit in ("home_all", "preheat"):
+            self.tap(hit)
+            self.app.close_modal()
+        self.assertEqual(self.mr.scripts, [])
+
+    def test_no_motion_during_a_filament_job(self):
+        self.app.runner = DeferredRunner()     # the load keeps running
+        self.app.screens["filament"].start("load")
+        self.mr.scripts.clear()
+        self.app.show("move")
+        self.tap("home_all")
+        self.assertEqual(self.mr.scripts, [])
+
+    def test_cooldown_during_a_print_asks_first(self):
+        self.printing()
+        self.app.show("temps")
+        self.tap("cooldown")
+        self.assertEqual(self.app.current, "confirm")
+        self.assertEqual(self.mr.scripts, [])
+
+    def test_restart_is_refused_if_a_print_started_meanwhile(self):
+        self.app.show("settings")
+        self.tap("restart_klipper")
+        self.assertEqual(self.app.current, "confirm")
+        self.mr.status = status(print_stats={"state": "printing",
+                                             "filename": "a.gcode"})
+        self.app.poll()
+        self.tap("yes")
+        self.assertNotIn("restart", self.mr.calls)
+
+    def test_files_arriving_later_restore_the_cards(self):
+        runner = DeferredRunner()
+        self.app.runner = runner
+        self.app.show("files")
+        rect = LAYOUT["files"].hit("file0").rect
+        self.assertIn("fill %d,%d,%d,%d,%d" % (tuple(rect) + (BG,)),
+                      self.sent)
+        self.sent.clear()
+        runner.run_all()
+        bg = LAYOUT["files"].bg
+        self.assertIn("xpic %d,%d,%d,%d,%d,%d,%d"
+                      % (tuple(rect) + rect[:2] + (bg,)), self.sent)
+        self.assertIn('"a"', " ".join(self.sent))
+
+    def test_empty_klipper_message_does_not_crash(self):
+        self.mr.status = status(webhooks={"state": "", "state_message": ""})
+        self.app.poll()
+        self.app.show("settings")
+        self.app.poll()
+
+    def test_release_on_another_screen_does_nothing(self):
+        x, y, w, h = self.app.canvas.screen.hit("home_all").rect
+        self.app.on_touch(x + 1, y + 1, True)
+        self.app.show("move")       # e.g. a message popped up
+        self.app.on_touch(x + 1, y + 1, False)
+        self.assertEqual(self.mr.scripts, [])
+
+
+class ScreenIdTest(unittest.TestCase):
+    def make(self, screen_id):
+        data = {"size": [800, 480], "screen_id": screen_id,
+                "screens": {}}
+        layout = Layout(data)
+        layout.screens = LAYOUT.screens
+        self.sent = []
+        app = UIApp(lambda d: self.sent.append(d), FakeMoonraker(),
+                    SyncRunner(), layout,
+                    prefs_path=os.path.join(tempfile.mkdtemp(), "p.json"))
+        app.poll()
+        app.start()
+        return app
+
+    def tap_home_all(self, app):
+        x, y, w, h = app.canvas.screen.hit("home_all").rect
+        app.on_touch(x + 1, y + 1, True)
+        app.on_touch(x + 1, y + 1, False)
+
+    def test_touches_wait_for_the_screen_id(self):
+        app = self.make(1234)
+        self.assertIn(b"get sys2" + tjc.TERM, self.sent)
+        self.tap_home_all(app)
+        self.assertEqual(app.mr.scripts, [])
+        app.handle(tjc.Event(tjc.NUMBER, value=1234))
+        self.tap_home_all(app)
+        self.assertEqual(app.mr.scripts, ["G28"])
+
+    def test_wrong_screen_file_ignores_touches(self):
+        app = self.make(1234)
+        app.handle(tjc.Event(tjc.NUMBER, value=0))
+        self.tap_home_all(app)
+        self.assertEqual(app.mr.scripts, [])
+
+
+class PrefsTest(unittest.TestCase):
+    def test_bad_values_fall_back_to_defaults(self):
+        path = os.path.join(tempfile.mkdtemp(), "p.json")
+        with open(path, "w") as f:
+            f.write('{"brightness": "high", "sleep_minutes": 999}')
+        from plus4screen.ui.app import Prefs
+        prefs = Prefs(path)
+        self.assertEqual(prefs["brightness"], 80)
+        self.assertEqual(prefs["sleep_minutes"], 240)
 
 
 class TextTest(unittest.TestCase):

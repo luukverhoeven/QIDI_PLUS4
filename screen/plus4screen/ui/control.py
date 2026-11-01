@@ -20,6 +20,9 @@ FAN_NAMES = ("cooling_fan", "auxiliary_cooling_fan", "chamber_circulation_fan")
 FAN_STEP = 10
 PRESETS = {"pre_pla": (220, 60), "pre_petg": (250, 70),
            "pre_abs": (260, 100)}
+# Move-screen buttons that move the printer or use the extruder.
+MOTION = set(JOG) | {"home_xy", "home_all", "retract", "extrude",
+                     "motors_off"}
 
 
 class Move(Screen):
@@ -49,11 +52,9 @@ class Move(Screen):
         if hit_id in STEPS:
             self.step = STEPS[hit_id]
             self.enter()
+        elif hit_id in MOTION and app.refuse_motion():
+            return
         elif hit_id in JOG:
-            if s.busy_printing:
-                app.message("Not while printing", "Pause or stop the print "
-                            "before moving the axes.")
-                return
             axis, sign = JOG[hit_id]
             app.gcode("G91\nG1 %s%g F%d\nG90"
                       % (axis, sign * self.step, JOG_FEED[axis]))
@@ -175,6 +176,8 @@ class Filament(Screen):
             def chosen(value):
                 self.custom = value
                 self.material = "mat_custom"
+                if app.current == self.name:
+                    self.enter()
             app.keypad("Filament temperature", "180 to 300 °C",
                        self.custom, 180, 300, chosen)
         elif hit_id in ("load", "unload"):
@@ -199,7 +202,8 @@ class Filament(Screen):
             if app.current == self.name:
                 self.refresh(app.state)
         app.gcode("%s TEMP=%d" % (macro, job.temp), done)
-        self.refresh(app.state)
+        if app.current == self.name:
+            self.refresh(app.state)
 
 
 class Temps(Screen):
@@ -220,7 +224,9 @@ class Temps(Screen):
         if hit_id.startswith("set_"):
             set_heater(app, HEATERS.index(hit_id[4:]))
         elif hit_id.startswith("off_"):
-            app.gcode(HEAT_CMD[HEATERS.index(hit_id[4:])] % 0)
+            index = HEATERS.index(hit_id[4:])
+            self.while_printing("Turn the %s off?" % HEATERS[index],
+                                lambda: app.gcode(HEAT_CMD[index] % 0))
         elif hit_id.startswith("fan"):
             index = int(hit_id[3])
             step = FAN_STEP if hit_id.endswith("_up") else -FAN_STEP
@@ -229,11 +235,23 @@ class Temps(Screen):
                       % (FAN_NAMES[index], value / 100.0))
         elif hit_id in PRESETS:
             nozzle, bed = PRESETS[hit_id]
-            app.gcode("M104 S%d\nM140 S%d" % (nozzle, bed))
+            self.while_printing("Change the print temperatures?",
+                                lambda: app.gcode("M104 S%d\nM140 S%d"
+                                                  % (nozzle, bed)))
         elif hit_id == "cooldown":
-            app.gcode("M104 S0\nM140 S0\nM141 S0")
+            self.while_printing("Turn all heaters off?",
+                                lambda: app.gcode("M104 S0\nM140 S0\nM141 S0"))
         elif hit_id == "close":
             app.show("move")
+
+
+    def while_printing(self, question, act):
+        """Run ``act``; ask first when it changes a running print."""
+        if self.state.busy_printing:
+            self.app.confirm(question, "A print is running and uses these "
+                             "temperatures.", "Change", act)
+        else:
+            act()
 
 
 SCREENS = {"move": Move, "filament": Filament, "temps": Temps}

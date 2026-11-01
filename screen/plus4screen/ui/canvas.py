@@ -95,6 +95,20 @@ class Canvas:
         x, y, w, h = rect
         self.send("fill %d,%d,%d,%d,%d" % (x, y, w, h, color))
 
+    def blank(self, rect, color):
+        """Paint over a region and forget the live content drawn in it."""
+        self.fill(rect, color)
+        for cache, items in ((self.texts, self.screen.texts),
+                             (self.bars, self.screen.bars),
+                             (self.dots, self.screen.dots)):
+            for item_id in [i for i in cache
+                            if intersects(items[i].rect, rect)]:
+                del cache[item_id]
+
+    def restore(self, rect):
+        """Cut a region from its picture again (after ``blank``)."""
+        self._restore(rect)
+
     # Touch feedback ---------------------------------------------------------
 
     def press(self, hit_id):

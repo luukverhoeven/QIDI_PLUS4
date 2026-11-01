@@ -20,6 +20,7 @@ plus4screen reads layout.json at runtime (copied to
 """
 
 import functools
+import hashlib
 import http.server
 import json
 import os
@@ -39,7 +40,7 @@ SIZE = (800, 480)
 # picture 0, which the boot page of the screen file shows.
 SCREENS = ["boot", "home", "printing", "files", "preview", "move", "filament",
            "temps", "tools", "tool_run", "settings", "about", "keypad",
-           "confirm", "message"]
+           "confirm", "message", "wifi", "wifi_pass"]
 
 # Fonts of the screen file, in the order the TJC editor must add them.
 # (CSS class, TJC font ID, family, CSS pixel size, weight)
@@ -108,10 +109,22 @@ def check(name, info):
                                  % (name, kind, item["id"], item["rect"]))
 
 
+def screen_id(layout):
+    """A number for this set of pictures and fonts. Program.s stores it in
+    sys2, so plus4screen can tell that the screen has the matching file."""
+    digest = hashlib.sha256()
+    for picture in layout["pictures"]:
+        with open(os.path.join(BUILD, "pictures", picture["file"]), "rb") as f:
+            digest.update(f.read())
+    digest.update(json.dumps(layout["fonts"], sort_keys=True).encode())
+    return int(digest.hexdigest()[:7], 16) + 1     # 1 to 2^28, never 0
+
+
 def main():
-    shutil.rmtree(BUILD, ignore_errors=True)
-    os.makedirs(os.path.join(BUILD, "pictures"))
-    os.makedirs(os.path.join(BUILD, "preview"))
+    # Only what this script makes; build/plus4ui.tft comes from the editor.
+    for sub in ("pictures", "preview"):
+        shutil.rmtree(os.path.join(BUILD, sub), ignore_errors=True)
+        os.makedirs(os.path.join(BUILD, sub))
     server = serve(DESIGN)
     base = "http://127.0.0.1:%d" % server.server_address[1]
     layout = {"size": list(SIZE),
@@ -154,6 +167,9 @@ def main():
         browser.close()
     server.shutdown()
 
+    layout["screen_id"] = screen_id(layout)
+    print("screen id %d: put 'sys2=%d' in Program.s" % (layout["screen_id"],
+                                                       layout["screen_id"]))
     for path in (os.path.join(BUILD, "layout.json"), RUNTIME_COPY):
         with open(path, "w") as f:
             json.dump(layout, f, indent=1, sort_keys=True)

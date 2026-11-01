@@ -5,13 +5,14 @@ import time
 
 from .base import Screen
 from .text import (ACC, AMBER, BG, MUTE, RED, SUB, TEXT, clock, duration,
-                   file_title, filament, target, temp)
+                   file_title, filament, first_line, target, temp)
 
 HEATERS = ("nozzle", "bed", "chamber")
 HEAT_CMD = ("M104 S%d", "M140 S%d", "M141 S%d")
 HEAT_MAX = (300, 110, 65)
 HEAT_NAME = ("Nozzle", "Bed", "Chamber")
 HEATING_MARGIN = 2.0
+BIG_Z_CHANGE = 0.5           # mm; larger Z offset changes are confirmed
 FILES_PER_PAGE = 6
 
 
@@ -32,10 +33,9 @@ def state_label(s):
 
 def status_line(s):
     if not s.online:
-        return s.error.splitlines()[0] if s.error else \
-            "Moonraker is not reachable"
+        return first_line(s.error, "Moonraker is not reachable")
     if not s.ready:
-        return (s.state_message or s.klippy_state).splitlines()[0]
+        return first_line(s.state_message, s.klippy_state, "Starting")
     heating = [HEAT_NAME[i].lower() for i, (cur, tgt) in enumerate(s.temps)
                if tgt >= 1 and cur < tgt - HEATING_MARGIN]
     if heating:
@@ -94,6 +94,7 @@ class Home(Screen):
         self.draw_last()
 
     def refresh(self, s):
+        self.draw_last()          # cached: only sends what changed
         text, color = state_label(s)
         self.text("state", text, color)
         self.canvas.dot("state_dot", color)
@@ -138,6 +139,8 @@ class Home(Screen):
                       % (0 if self.state.caselight else 1))
         elif hit_id == "filament":
             app.show("filament")
+        elif hit_id in ("home_all", "preheat") and app.refuse_motion():
+            return
         elif hit_id == "home_all":
             app.gcode("G28")
         elif hit_id == "preheat":
@@ -228,10 +231,21 @@ class Printing(Screen):
                        lambda v: app.gcode("M221 S%d" % v))
         elif hit_id == "set_zoffset":
             app.keypad("Z offset", "-2.000 to 2.000 mm, + is further from "
-                       "the bed", s.z_offset, -2, 2,
-                       lambda v: app.gcode("SET_GCODE_OFFSET Z=%.3f MOVE=1"
-                                           % v),
+                       "the bed", s.z_offset, -2, 2, self.set_zoffset,
                        decimals=3, negative=True)
+
+    def set_zoffset(self, value):
+        app = self.app
+
+        def send():
+            app.gcode("SET_GCODE_OFFSET Z=%.3f MOVE=1" % value)
+        change = value - self.state.z_offset
+        if abs(change) > BIG_Z_CHANGE:
+            app.confirm("Move Z by %+.3f mm?" % change,
+                        "The Z offset goes from %+.3f to %+.3f mm."
+                        % (self.state.z_offset, value), "Change", send)
+        else:
+            send()
 
 
 class Files(Screen):
@@ -243,16 +257,20 @@ class Files(Screen):
         self.page = 0
         self.files = None         # all files, newest first
         self.error = None
+        self.blanked = set()      # card slots painted over
 
-    def enter(self, **options):
+    def enter(self, reload=True, **options):
+        self.blanked = set()
         self.canvas.toggle("tab_local", not self.usb)
         self.canvas.toggle("tab_usb", self.usb)
-        self.app.runner.spawn(self.app.mr.list_files, self._got_files)
+        if reload:
+            self.app.runner.spawn(self.app.mr.list_files, self._got_files)
         self.draw()
 
     def _got_files(self, files, error):
         self.files = files or []
         self.error = str(error) if error else None
+        self.app.forget_changed_metadata(self.files)
         if self.app.current == self.name:
             self.draw()
 
@@ -279,11 +297,15 @@ class Files(Screen):
         start = self.page * FILES_PER_PAGE
         for i in range(FILES_PER_PAGE):
             index = start + i
+            rect = self.canvas.screen.hit("file%d" % i).rect
             if index < len(files):
+                if i in self.blanked:
+                    self.blanked.discard(i)
+                    self.canvas.restore(rect)
                 self.draw_card(i, files[index])
-            else:
-                self.canvas.fill(self.canvas.screen.hit("file%d" % i).rect,
-                                 BG)
+            elif i not in self.blanked:
+                self.blanked.add(i)
+                self.canvas.blank(rect, BG)
 
     def draw_card(self, i, entry):
         self.text("name%d" % i, file_title(entry["path"]))
@@ -308,12 +330,12 @@ class Files(Screen):
             usb = hit_id == "tab_usb"
             if usb != self.usb:
                 self.usb, self.page = usb, 0
-                self.app.show(self.name)
+                self.app.show(self.name, reload=False)
         elif hit_id in ("prev", "next"):
             page = self.page + (1 if hit_id == "next" else -1)
             if 0 <= page < pages:
                 self.page = page
-                self.app.show(self.name)
+                self.app.show(self.name, reload=False)
         elif hit_id.startswith("file"):
             index = self.page * FILES_PER_PAGE + int(hit_id[4:])
             if index < len(files):

@@ -21,12 +21,15 @@ What the screen sends back is decided by the event code in QIDI's layout
 
 import collections
 import errno
+import logging
 import os
 import select
 import termios
 import time
 
 TERM = b"\xff\xff\xff"
+
+log = logging.getLogger("plus4screen")
 
 Event = collections.namedtuple("Event", "kind page widget value text raw")
 Event.__new__.__defaults__ = (None, None, None, None, b"")
@@ -225,8 +228,13 @@ def open_screen(path, baud=115200, fallback=9600):
     port.close()
     slow = SerialPort(path, fallback)
     if answers(slow):
+        log.info("screen answered at %d baud; switching it to %d",
+                 fallback, baud)
         slow.write(encode("baud=%d" % baud))
         termios.tcdrain(slow.fd)
         time.sleep(0.2)
+    else:
+        log.warning("screen does not answer at %d or %d baud", baud,
+                    fallback)
     slow.close()
     return SerialPort(path, baud)

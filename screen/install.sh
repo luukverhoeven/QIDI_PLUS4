@@ -6,6 +6,8 @@
 #   ./install.sh --no-flash      own interface, plus4ui.tft is already on the
 #                                screen
 #   ./install.sh --qidi-screen   keep QIDI's screen file (QIDI's layout)
+#   --force                      write plus4ui.tft even without a saved copy
+#                                of QIDI's screen file
 # Undo with ./uninstall.sh
 set -euo pipefail
 
@@ -14,20 +16,35 @@ DEST=/home/mks/plus4-screen
 UNIT=plus4-screen.service
 STATE=$DEST/.stock-service
 MODE_FILE=$DEST/.mode
+SCREEN_FILE=$DEST/.screen-file     # which screen file is on the screen
 TFT="$SRC/ui/build/plus4ui.tft"
 BACKUP=/home/mks/qidi-screen-backup.tft
 
 mode=plus4
 flash=1
+force=0
 for arg in "$@"; do
     case "$arg" in
         --no-flash) flash=0 ;;
         --qidi-screen) mode=qidi; flash=0 ;;
+        --force) force=1 ;;
         *) echo "unknown option: $arg" >&2; exit 2 ;;
     esac
 done
 if [ "$mode" = plus4 ] && [ "$flash" = 1 ] && [ ! -f "$TFT" ]; then
     echo "$TFT is missing. Nothing changed." >&2
+    exit 1
+fi
+if [ "$mode" = qidi ] && [ "$(cat "$SCREEN_FILE" 2>/dev/null)" = plus4ui ]; then
+    echo "plus4ui.tft is on the screen; QIDI's layout needs QIDI's screen" >&2
+    echo "file. Run ./uninstall.sh first. Nothing changed." >&2
+    exit 1
+fi
+if [ "$mode" = plus4 ] && [ "$flash" = 1 ] && [ "$force" = 0 ] \
+        && [ ! -f "$BACKUP" ] && ! sudo test -f /root/800_480.tft.bak; then
+    echo "No copy of QIDI's screen file ($BACKUP or" >&2
+    echo "/root/800_480.tft.bak), so it could not be put back later." >&2
+    echo "Use --force to write plus4ui.tft anyway. Nothing changed." >&2
     exit 1
 fi
 
@@ -88,6 +105,7 @@ if [ "$mode" = plus4 ]; then
         (cd "$DEST" && python3 -m plus4screen.flash "$TFT")
         sleep 6
     fi
+    echo plus4ui > "$SCREEN_FILE"
 fi
 
 echo "Starting $UNIT"

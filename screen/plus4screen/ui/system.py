@@ -7,7 +7,7 @@ from .. import __version__
 from ..settings import ipv4, wifi_ssid
 from ..tools import LEVEL_MARKS, RESTART_GRACE, SHAPER_MARKS
 from .base import Screen
-from .text import ACC, AMBER, RED, SUB, TEXT, clock, duration
+from .text import ACC, AMBER, RED, SUB, TEXT, clock, duration, first_line
 
 log = logging.getLogger("plus4screen")
 
@@ -87,6 +87,10 @@ class ToolRun(Screen):
         app = self.app
         if self.running:
             return
+        reason = app.busy_reason()    # things may have changed since asked
+        if reason:
+            app.message("Cannot start now", reason)
+            return
         self.job = job
         app.show(self.name)
 
@@ -100,6 +104,9 @@ class ToolRun(Screen):
         if not job or job.finished or job.fetching:
             return
         if self.app.dry_run:
+            if job.call_done_at is not None:
+                job.finished = True     # nothing ran; do not block forever
+                job.seen = len(job.marks)
             return
         job.fetching = True
 
@@ -205,7 +212,7 @@ class Settings(Screen):
             self.text("klipper", "Ready", TEXT)
             self.canvas.dot("klipper_dot", ACC)
         else:
-            message = (s.state_message or s.klippy_state).splitlines()[0]
+            message = first_line(s.state_message, s.klippy_state, "Starting")
             self.text("klipper", message, AMBER)
             self.canvas.dot("klipper_dot", AMBER)
         self.text("versions", "plus4screen %s" % __version__)
@@ -250,7 +257,7 @@ class Settings(Screen):
             app.message("Not while printing", "Stop the print first.")
             return
         app.confirm(question, "The printer is unavailable for a few "
-                    "seconds.", yes, lambda: app.action(name, fn))
+                    "seconds.", yes, lambda: self.unless_printing(name, fn))
 
     def power(self, question, yes, fn):
         app = self.app
@@ -258,7 +265,16 @@ class Settings(Screen):
             app.message("Not while printing", "Stop the print first.")
             return
         app.confirm(question, "Klipper, Moonraker and this screen stop.",
-                    yes, lambda: app.action(question, fn))
+                    yes, lambda: self.unless_printing(question, fn))
+
+    def unless_printing(self, name, fn):
+        """Run a restart or power action, unless a print started since the
+        question was asked."""
+        if self.state.busy_printing:
+            self.app.message("Not while printing", "A print started. Stop "
+                             "it first.")
+            return
+        self.app.action(name, fn)
 
 
 class About(Screen):

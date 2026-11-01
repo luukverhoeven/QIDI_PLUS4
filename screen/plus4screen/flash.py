@@ -14,9 +14,10 @@ import argparse
 import os
 import select
 import sys
+import termios
 import time
 
-from .tjc import TERM, SerialPort
+from .tjc import TERM, SerialPort, answers
 
 BLOCK = 4096
 ACK = 0x05
@@ -55,13 +56,32 @@ def connect(port):
         else ""
 
 
+def screen_speed(port_path):
+    """The speed the screen answers at now: 115200 or the TJC default."""
+    for speed in (115200, 9600):
+        port = SerialPort(port_path, speed)
+        try:
+            if answers(port):
+                return speed
+        finally:
+            port.close()
+    return 115200
+
+
 def flash(path, port_path="/dev/ttyS1", baud=115200, out=sys.stdout):
-    data = open(path, "rb").read()
-    port = SerialPort(port_path, 115200)
+    with open(path, "rb") as f:
+        data = f.read()
+    speed = screen_speed(port_path)
+    port = SerialPort(port_path, speed)
     who = connect(port)
-    out.write("screen: %s\n" % (who or "no answer to connect"))
+    out.write("screen (%d baud): %s\n" % (speed, who or "no answer"))
+    # Touches during the upload would send bytes that look like acks.
+    port.write(b"sendxy=0" + TERM)
+    time.sleep(0.2)
+    termios.tcflush(port.fd, termios.TCIFLUSH)
     port.write(b"whmi-wri %d,%d,0" % (len(data), baud) + TERM)
-    if baud != 115200:
+    if baud != speed:
+        termios.tcdrain(port.fd)
         time.sleep(0.1)
         port.close()
         port = SerialPort(port_path, baud)
