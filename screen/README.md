@@ -2,13 +2,33 @@
 
 `plus4screen` replaces QIDI's closed-source screen program `xindi`. It drives the Plus4's built-in TJC touchscreen over `/dev/ttyS1` and talks to Klipper through Moonraker.
 
+It has two interfaces:
+
+- **Own interface** (`--ui plus4`, the default): a new design with its own screen file, [`ui/build/plus4ui.tft`](ui/build/plus4ui.tft). Every screen is drawn by `plus4screen`; the design lives in this repository as HTML. See [Own interface](#own-interface).
+- **QIDI's layout** (`--ui qidi`): keeps the screen file QIDI flashed and reuses its pages. See [QIDI's layout](#qidis-layout---ui-qidi).
+
+**Dependencies:** Python 3 standard library only. Nothing to `pip install` on the printer.
+
+## Own interface
+
+Home, printing, files, file preview, move, filament (single spool), temperatures and fans, tools (auto bed levelling, input shaping), settings, about, plus a keypad, a confirm dialog and a message dialog.
+
+- **Screen file:** `plus4ui.tft` holds only pictures and fonts: a boot page and an empty page. It has no buttons. Writing it replaces QIDI's screen file; [`install.sh`](install.sh) saves QIDI's copy first and [`uninstall.sh`](uninstall.sh) writes it back.
+- **Drawing:** each screen is a full-size picture (`pic`). Pressed and selected looks are cut from two more pictures of the same screen (`xpic`). Live values are drawn with `xstr` on top of the picture they sit on.
+- **Touch:** the screen reports raw touch positions (`sendxy=1`, frames `67 x y press`). `plus4screen` finds the button under the finger in [`plus4screen/ui_layout.json`](plus4screen/ui_layout.json).
+- **Screen off:** the backlight goes off after 5 minutes without a touch (Settings: 1, 2, 5, 10, 30 minutes or never). The touch that wakes it does nothing else. Brightness and sleep time are kept in `~/.config/plus4screen.json`.
+- **Speed:** the screen talks at 115200 baud. If it comes up at the TJC default of 9600, `plus4screen` switches it over at start.
+
+Not done yet: print thumbnails (the slots show an empty tile), Wi-Fi setup (use Fluidd or `nmtui`), bed screw adjustment.
+
+How the design becomes `plus4ui.tft`: [`ui/README.md`](ui/README.md).
+
+## QIDI's layout (`--ui qidi`)
+
 - **Screen firmware:** unchanged. The `.tft` QIDI flashed onto the screen only holds pages and buttons; all behaviour lives in the host program. `plus4screen` reuses QIDI's pages, so nothing is flashed.
 - **Filament:** the control page's filament button opens a single-spool load/unload flow instead of the QIDI Box page.
-- **Dependencies:** Python 3 standard library only. Nothing to `pip install` on the printer.
 
-> **Status: not yet tested on a printer.** The protocol and every page/widget number come from QIDI's layout file and are checked by the tests. Run it in `--dry-run` mode first (see [Try it](#try-it-without-installing)).
-
-## What works
+### What works
 
 | Page | What `plus4screen` does |
 | --- | --- |
@@ -24,7 +44,7 @@
 
 `LOAD_FILAMENT` and `UNLOAD_FILAMENT` are the macros in [`config/gcode_macro.cfg`](../config/gcode_macro.cfg) on this branch; they must be in the printer's config.
 
-## What does not work (yet)
+### What does not work (yet)
 
 Use Fluidd (or the stock program) for these:
 
@@ -39,7 +59,7 @@ These are the parts **not verified** on hardware. The code keeps each one in a s
 
 The jog and extruder directions (`W_JOG`, `W_EXTRUDER`) follow what stock `xindi` sends for the same widgets (18 = Z−, 19 = Z+, 20 = retract, 21 = extrude). They are checked against `xindi`, not yet on a printer.
 
-## How it works
+### How it works
 
 ```
  touchscreen  --65/71 frames-->  plus4screen  --HTTP-->  Moonraker --> Klipper
@@ -63,43 +83,50 @@ On the printer, as `mks`:
 #   scp -r screen mks@<printer-ip>:~/plus4screen-src
 cd ~/plus4screen-src
 
-sudo systemctl stop makerbase-client     # QIDI's screen program
-python3 -m plus4screen --dry-run -v      # G-code is only logged
+sudo systemctl stop makerbase-client          # QIDI's screen program
+python3 -m plus4screen.flash ui/build/plus4ui.tft   # own interface only, ~3 min
+python3 -m plus4screen --dry-run -v           # G-code is only logged
 # tap around, watch the log; Ctrl-C to stop
-sudo systemctl start makerbase-client    # stock screen back
 ```
 
+- **QIDI's layout instead:** skip the flash step and add `--ui qidi`. Afterwards `sudo systemctl start makerbase-client` gives the stock screen back.
+- **After writing `plus4ui.tft`:** QIDI's program no longer fits the screen. `python3 -m plus4screen.flash <QIDI .tft>` writes QIDI's file back (about 30 minutes); QIDI's program keeps its last one as `/root/800_480.tft.bak`.
 - **Service name:** `makerbase-client` is the service whose journal shows the screen traffic on V1.7.x. If `systemctl stop` says it does not exist, find the right one with `systemctl list-units | grep -i -e xindi -e makerbase`.
-- **Logs:** every tap is logged as `touch page=… widget=…`, which is also how to find the numbers of buttons that are not handled yet.
+- **Logs:** every tap is logged (`touch home.preheat`, or `touch page=… widget=…` with QIDI's layout).
 - **Real run:** without `--dry-run`, G-code and print actions are sent for real.
 
 ## Install
 
 ```bash
 cd ~/plus4screen-src
-./install.sh
+./install.sh                 # own interface; writes plus4ui.tft (~3 min)
+./install.sh --no-flash      # own interface, plus4ui.tft is already on the screen
+./install.sh --qidi-screen   # QIDI's layout, nothing is written to the screen
 ```
 
 The script:
 1. finds QIDI's screen service;
 2. copies the program to `/home/mks/plus4-screen`;
-3. installs and starts [`systemd/plus4-screen.service`](systemd/plus4-screen.service);
-4. stops and disables the stock service.
+3. saves QIDI's screen file as `/home/mks/qidi-screen-backup.tft` and writes `plus4ui.tft` (own interface only);
+4. stops and disables the stock service;
+5. installs and starts [`systemd/plus4-screen.service`](systemd/plus4-screen.service).
 
 Logs: `journalctl -u plus4-screen -f`.
 
-To undo, run `./uninstall.sh`. It removes `plus4-screen` and re-enables QIDI's service.
+To undo, run `./uninstall.sh`. With the own interface it first writes QIDI's screen file back (about 30 minutes), then re-enables QIDI's service.
 
-A QIDI update may re-enable the stock service; run `./install.sh` again afterwards.
+A QIDI update may re-enable the stock service; run `./install.sh --no-flash` again afterwards.
 
 ## Options
 
 ```
-python3 -m plus4screen [--port /dev/ttyS1] [--moonraker http://127.0.0.1:7125]
+python3 -m plus4screen [--ui plus4|qidi] [--port /dev/ttyS1]
+                       [--moonraker http://127.0.0.1:7125]
                        [--lang 2] [--poll 1.0] [--dry-run] [-v]
+python3 -m plus4screen.flash FILE.tft [--baud 115200]
 ```
 
-`--lang` is the screen's language index: 0 Chinese, 1 Russian, 2 English, 3 Japanese, 4 French, 5 German, 6 Italian, 7 Spanish, 9 Portuguese.
+`--lang` (QIDI's layout only) is the screen's language index: 0 Chinese, 1 Russian, 2 English, 3 Japanese, 4 French, 5 German, 6 Italian, 7 Spanish, 9 Portuguese.
 
 ## Development
 
@@ -112,8 +139,9 @@ python3 -m unittest discover -s tests
 - **Page logic:** against a fake Moonraker.
 - **Layout check:** `pages.py` against QIDI's actual `UI/xindi_800_480.HMI`.
 - **End-to-end:** the real main loop on a pseudo-terminal with a stub Moonraker HTTP server.
+- **Own interface:** taps, keypad, navigation, sleep and the drawing cache against a fake printer ([`tests/test_ui.py`](tests/test_ui.py)).
 
-To add a page:
+To add a page to QIDI's layout:
 1. Look it up in [`LAYOUT.md`](LAYOUT.md).
 2. Add its numbers to `pages.py`.
 3. Add `enter_…`/`touch_…` methods in `app.py` and register them in `ENTER`/`TOUCH`.

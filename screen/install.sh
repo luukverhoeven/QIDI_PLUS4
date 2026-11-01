@@ -1,29 +1,55 @@
 #!/bin/bash
 # Install plus4screen on the printer and switch the touchscreen over to it.
-# Run on the printer, from this directory:  ./install.sh
+# Run on the printer, from this directory:
+#   ./install.sh                 own interface: writes ui/build/plus4ui.tft to
+#                                the screen (about 3 minutes)
+#   ./install.sh --no-flash      own interface, plus4ui.tft is already on the
+#                                screen
+#   ./install.sh --qidi-screen   keep QIDI's screen file (QIDI's layout)
 # Undo with ./uninstall.sh
 set -euo pipefail
 
 SRC="$(cd "$(dirname "$0")" && pwd)"
 DEST=/home/mks/plus4-screen
 UNIT=plus4-screen.service
-STATE=/home/mks/plus4-screen/.stock-service
+STATE=$DEST/.stock-service
+MODE_FILE=$DEST/.mode
+TFT="$SRC/ui/build/plus4ui.tft"
+BACKUP=/home/mks/qidi-screen-backup.tft
 
-# QIDI's screen program (xindi) runs from a systemd service. Find it by the
-# xindi path in its unit, falling back to the name seen on V1.7.x.
+mode=plus4
+flash=1
+for arg in "$@"; do
+    case "$arg" in
+        --no-flash) flash=0 ;;
+        --qidi-screen) mode=qidi; flash=0 ;;
+        *) echo "unknown option: $arg" >&2; exit 2 ;;
+    esac
+done
+if [ "$mode" = plus4 ] && [ "$flash" = 1 ] && [ ! -f "$TFT" ]; then
+    echo "$TFT is missing. Nothing changed." >&2
+    exit 1
+fi
+
+# QIDI's screen program (xindi) runs from a systemd service: makerbase-client
+# on V1.7.x. Other units also live in /root/xindi (makerbase-byid runs
+# mks-id.sh), so only a unit that starts xindi/build counts.
 find_stock_service() {
     local unit
+    if systemctl list-unit-files --no-legend makerbase-client.service \
+            2>/dev/null | grep -q '^makerbase-client.service'; then
+        echo makerbase-client.service
+        return
+    fi
     for unit in $(systemctl list-unit-files --type=service --no-legend \
                   | awk '{print $1}'); do
         [ "$unit" = "$UNIT" ] && continue
-        if systemctl cat "$unit" 2>/dev/null | grep -q 'xindi'; then
+        if systemctl cat "$unit" 2>/dev/null \
+                | grep -qE '^ExecStart=.*xindi/build'; then
             echo "$unit"
             return
         fi
     done
-    if systemctl list-unit-files makerbase-client.service >/dev/null 2>&1; then
-        echo makerbase-client.service
-    fi
 }
 
 stock="$(find_stock_service)"
@@ -34,18 +60,35 @@ fi
 echo "QIDI screen service: $stock"
 systemctl cat "$stock" | grep -E '^(ExecStart|User)=' || true
 
-echo "Installing to $DEST"
+echo "Installing to $DEST ($mode interface)"
 mkdir -p "$DEST"
 rm -rf "$DEST/plus4screen"
 cp -r "$SRC/plus4screen" "$DEST/"
 echo "$stock" > "$STATE"
+echo "$mode" > "$MODE_FILE"
 
-sudo cp "$SRC/systemd/$UNIT" /etc/systemd/system/$UNIT
+sed "s|^ExecStart=.*|ExecStart=/usr/bin/python3 -m plus4screen --ui $mode|" \
+    "$SRC/systemd/$UNIT" | sudo tee /etc/systemd/system/$UNIT >/dev/null
 sudo systemctl daemon-reload
 
 echo "Stopping and disabling $stock"
 sudo systemctl stop "$stock"
 sudo systemctl disable "$stock"
+sudo systemctl stop "$UNIT" 2>/dev/null || true
+
+if [ "$mode" = plus4 ]; then
+    # QIDI's program keeps the screen file it last wrote in /root.
+    if [ ! -f "$BACKUP" ] && sudo test -f /root/800_480.tft.bak; then
+        sudo cp /root/800_480.tft.bak "$BACKUP"
+        sudo chown "$(id -u):$(id -g)" "$BACKUP"
+        echo "Saved QIDI's screen file as $BACKUP"
+    fi
+    if [ "$flash" = 1 ]; then
+        echo "Writing plus4ui.tft to the screen"
+        (cd "$DEST" && python3 -m plus4screen.flash "$TFT")
+        sleep 6
+    fi
+fi
 
 echo "Starting $UNIT"
 sudo systemctl enable --now "$UNIT"

@@ -8,7 +8,7 @@ Type=simple
 User=mks
 SupplementaryGroups=dialout
 WorkingDirectory=/home/mks/plus4-screen
-ExecStart=/usr/bin/python3 -m plus4screen
+ExecStart=/usr/bin/python3 -m plus4screen --ui plus4
 Restart=always
 RestartSec=3
 
