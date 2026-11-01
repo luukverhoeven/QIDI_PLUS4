@@ -545,6 +545,10 @@ class App:
 
     def enter_file_list(self):
         self.render_files()
+        # The page's load event runs "tsw 255,0" (all touch off) and only
+        # its timer, which the host never starts here, turns it back on.
+        # xindi sends "tsw 255,1" itself once the list is filled.
+        self.send("tsw 255,1")
 
         def done(files, error):
             if error is None:

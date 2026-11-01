@@ -328,6 +328,13 @@ class AppTest(unittest.TestCase):
 
     # Files ---------------------------------------------------------------
 
+    def test_file_list_turns_touch_back_on(self):
+        self.sent()
+        self.touch(P.MAIN, P.NAV_FILES)
+        cmds = self.sent()
+        self.assertIn("tsw 255,1", cmds)
+        self.assertGreater(cmds.index("tsw 255,1"), cmds.index("page 4"))
+
     def test_file_list_and_print(self):
         self.touch(P.MAIN, P.NAV_FILES)
         self.assertEqual(self.app.page, P.FILE_LIST)
