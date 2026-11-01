@@ -162,6 +162,19 @@ class AppTest(unittest.TestCase):
         self.touch(P.MAIN, P.W_ESTOP)
         self.assertEqual(self.mr.calls, ["estop"])
 
+    def test_main_light_toggle_and_heating_colours(self):
+        cmds = self.sent()
+        self.assertIn("b0.picc=12", cmds)            # caselight is on
+        self.assertIn("n1.pco=%d" % P.RED, cmds)     # bed target 60
+        self.assertIn("n0.pco=%d" % P.WHITE, cmds)   # nozzle target 0
+        self.touch(P.MAIN, P.W_LIGHT)
+        self.assertEqual(self.run_gcode(), ["SET_PIN PIN=caselight VALUE=0"])
+
+    def test_main_wifi_opens_network_page(self):
+        self.mr.system_info = lambda: {}
+        self.touch(P.MAIN, P.W_WIFI)
+        self.assertEqual(self.app.page, P.NETWORK)
+
     # Control page --------------------------------------------------------
 
     def test_jog_uses_selected_step(self):

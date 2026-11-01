@@ -362,9 +362,12 @@ class App(SettingsMixin, ToolsMixin, PicturesMixin):
         elif widget == P.W_ESTOP:
             log.warning("emergency stop from the screen")
             self.action("emergency stop", self.mr.emergency_stop)
+        elif widget == P.W_LIGHT:
+            self.gcode("SET_PIN PIN=caselight VALUE=%d"
+                       % (0 if self.state.caselight else 1))
         elif widget == P.W_WIFI:
-            log.info("Wi-Fi setup is not implemented, use the printer's "
-                     "network settings")
+            self.set_page = P.NETWORK
+            self.goto(P.NETWORK)
         else:
             return False
 
@@ -670,6 +673,11 @@ class App(SettingsMixin, ToolsMixin, PicturesMixin):
         if page == P.MAIN:
             for i in range(3):
                 self.set_val("n%d" % i, s.temps[i][0])
+                self.set_attr("n%d" % i, "pco",
+                              P.RED if s.temps[i][1] >= 1 else P.WHITE)
+            picc, picc2 = P.LIGHT_PICC[1 if s.caselight else 0]
+            self.set_attr("b0", "picc", picc)
+            self.set_attr("b0", "picc2", picc2)
             self.set_txt("t3", self.status_line())
         elif page in P.CONTROL_FAMILY:
             if page == P.CONTROL_KB:

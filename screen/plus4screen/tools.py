@@ -30,7 +30,7 @@ RESTART_GRACE = 90.0
 # LEVEL_RUNNING display per step 1-4: q1 picture, visible gm, white
 # labels among t0-t3 (the others gray).
 LEVEL_PICC = {1: 59, 2: 60, 3: 61, 4: 62}
-RED = 63488
+RED = P.RED
 
 
 class ToolJob:

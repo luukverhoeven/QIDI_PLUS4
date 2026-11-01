@@ -73,9 +73,12 @@ W_LEFT = 10              # stock "Next"
 W_RIGHT = 9              # stock "Back"
 
 # MAIN (page 3)
-W_WIFI = 1
+W_LIGHT = 0
+W_WIFI = 1               # opens NETWORK
 W_ESTOP = 2
 W_LAST_PRINT = 3         # the picture of the last print (cp0 / b3)
+LIGHT_PICC = ((11, 9), (12, 10))   # b0 (picc, picc2) off, on
+RED = 63488              # pco of a temperature that is heating
 
 # PRINTING (page 17) and PRINT_KB (page 18, keypad over the print page)
 W_PRINT_STOP = 0
