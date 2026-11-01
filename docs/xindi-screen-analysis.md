@@ -14,8 +14,9 @@ Findings from static analysis of QIDI's closed-source screen app, aimed at chang
 
 - The screen is a TJC (Nextion-compatible) serial display. `xindi` drives it with plain-text TJC commands and reacts to touch events identified by page and widget number.
 - The screen firmware (`.tft`) only defines the layout and which page/widget number each button reports. All behaviour lives in `xindi`.
-- The old single-spool load/unload flow is still fully present in `xindi` (pages 37, 39, 40, 41, 71, 72). In the current layout, the filament button on the control page leads to the Box page 113 instead.
-- **Inferred:** a modified screen layout that sends the user into page 37 could bring back the old flow without changing `xindi`. Whether the installed `.tft` still contains working pages 37–41 is **unknown**.
+- The old single-spool load/unload flow is still fully present in `xindi` (pages 37, 39, 40, 41, 71, 72). The installed screen firmware still draws those pages (see [Live screen tests](#live-screen-tests-1-nov-2026)).
+- In the current layout, the filament button on the control page leads to the Box page 113. Its **Unload** button runs the old unload and continues into the old load steps (page 40 → 37 → 39 → 41). Only the entry is Box-specific.
+- `load_mode`, which decides whether page 39 starts an unload or a load, is only ever set to "load". A screen-layout edit that jumps straight into page 39 therefore only works until the first load after each restart of `xindi`.
 
 ## Serial protocol (observed)
 
@@ -66,13 +67,18 @@ From the `refresh_page_show` switch (`0x7033f8`) and the navigation helpers:
 
 | Page | Widget | Action |
 | --- | --- | --- |
-| 35 or 36 | 3 | `page_to(36)` |
+| 35 or 36 | 3 | `page_to(36)` (temperature keypad) |
+| 37 | 9 | `go_to_control()` → page 35 (the **Back** button) |
 | 37 | 10 | `load_target = 220`, `page_to(39)` |
+| 39 | 6 / 7 / 8 | `load_target` = 220 / 250 / 300 |
+| 39 | 9 | `load_mode == 0`: `page_to(35)`. Otherwise: `page_to(37)` |
 | 39 | 10 | `load_mode == 0`: `page_to(40)` + `filament_unload()`. Otherwise: `page_to(41)` + `filament_load()` |
-| 40 | 9 | `load_mode = 1`, `page_to(37)` (unload, then load) |
+| 40 | 9 | `load_position_inited = 1`, `load_mode = 1`, `unload_finished = 1`, `page_to(37)` (unload, then load) |
 | 40 | 10 | `finish_unload()` if needed, then `page_to(113)` |
 | 72 | 9 | `load_mode = 1`, `filament_load()` |
 | 72 | 10 | `page_to(113)` |
+| 113 | 3 | Box **Load**: `SetLoadTarget()`, `page_to(127)` (new Box load flow) |
+| 113 | 4 | Box **Unload**: `SetLoadTarget()`, `filament_unload()`, `page_to(40)` (old unload page) |
 
 - `filament_load()` (`0x71fe20`) sets `load_step = 1` and sends `M604 S<load_target>` (`F0` added once the position is initialised).
 - `filament_unload()` (`0x720040`) sets `unload_step = 1` and sends `M603 S<load_target>`.
@@ -80,15 +86,32 @@ From the `refresh_page_show` switch (`0x7033f8`) and the navigation helpers:
 - `finish_unload()` (`0x73b26c`) sends `SET_KINEMATIC_POSITION Y=320` and a few moves.
 - `refresh_page_filament()` is still in the binary, but nothing calls it.
 - The old flow ends on the Box page 113 (page 40 and page 72, widget 10).
+- `load_mode` lives in `.bss`, so it is 0 (unload) when `xindi` starts. The only writes set it to 1 (page 40 widget 9, page 72 widget 9). The machine code has four references to it, all in the click handler: two reads, two writes of 1. Nothing resets it to 0.
+- `unload_finished = 1` makes several later taps call `finish_unload()`, which sends `SET_KINEMATIC_POSITION Y=320`. Faking page 40 widget 9 without a real unload could therefore give Klipper a wrong Y position.
 
-### Unknowns
+## Live screen tests (1 Nov 2026)
 
-- No `page_to(37)` is reachable from page 35 or 36 in `xindi`. The only entries into page 37 come from pages 40 and 72, which are inside the old flow. **Unknown** whether the current `.tft` has a button that opens page 37 by itself.
-- **Unknown** whether pages 37–41, 71 and 72 in the installed `.tft` still have the widgets the handler expects (widget 10 on 37/39, 9 and 10 on 40 and 72).
+Commands were written straight to the screen to open pages without going through `xindi`.
+
+- **How:** as `mks`, open `/dev/ttyS1` with `O_WRONLY | O_NONBLOCK | O_NOCTTY` and write `page <n>` + `FF FF FF`. `mks` is in the `dialout` group, so no `sudo` is needed.
+- **Don't use a normal open:** the port has `-clocal`, so `printf ... > /dev/ttyS1` blocks forever waiting for a carrier signal.
+- **Taps are logged:** the screen's raw replies and touch events appear in `journalctl -u makerbase-client`, which `mks` can read. Page changes and clicks also appear in `qidi.log`.
+
+| Page | What the installed screen shows |
+| --- | --- |
+| 36 | Temperature keypad ("Extruder", "MAX: 370℃", digits 0–9) |
+| 37 | Control layout with "Please confirm that the filament has entered the nozzle.", **Next**, and a "50mm / Back / 100mm" control. **Back** is widget 9 and opens page 35 |
+| 39 | Control layout with step icons (home, move X, cutter, filament) and the same **Next** and "50mm / Back / 100mm" controls |
+
+- Pages 37 and 39 exist in the installed screen firmware and their buttons report the widget numbers the click handler expects.
+- After a page is opened this way, `xindi` still believes the screen is on the previous page. It keeps updating that page's widgets, and the screen answers with `0x02` (invalid component). Tapping Home brings both back in sync.
+- Sending `printh 65 23 08 01 ff ff ff` to the screen did not produce a touch event in `xindi`. Using `printh` to fake taps is **not confirmed**.
 
 ## Ways to change the touchscreen
 
-1. **Edit the screen layout (`.HMI`) in the TJC editor (Windows).** Give the filament button on page 35 a local `page 37` action, or add a new button for it. `xindi` would then handle pages 37 → 39 → 40/41 as before. Smallest change, but:
+0. **Use the existing path, no changes.** Give the external spool a filament type once on the Box page; issue #84 users report that this enables Unload. **Unload** then runs the old unload (page 40), and page 40's Load button continues through pages 37 → 39 → 41. For a load without a previous unload, use the `LOAD_FILAMENT` macro in Fluidd.
+1. **Edit the screen layout (`.HMI`) in the TJC editor (Windows).** Give the filament button on page 35 a local `page 39` or `page 37` action, or add a new button for it. `xindi` would then handle the old steps. But:
+   - Because `load_mode` never returns to 0, page 39 would only unload until the first load after each restart of `xindi`.
    - The edited `.tft` has to be flashed onto the screen.
    - Every QIDI update overwrites it.
    - The page numbers above must be checked in the editor first.
