@@ -116,7 +116,21 @@ Commands were written straight to the screen to open pages without going through
    - Every QIDI update overwrites it.
    - The page numbers above must be checked in the editor first.
 2. **Patch `xindi`.** For example, point page 35 widget 13 at `page_to(37)` instead of the Box page. That means binary patching a closed program that QIDI updates replace. Not recommended.
-3. **Replace `xindi` with a self-written program** that speaks the protocol above and talks to Moonraker. Full control, but it also has to take over Wi-Fi setup, updates, calibration and printing screens.
+3. **Replace `xindi` with a self-written program** that speaks the protocol above and talks to Moonraker. Full control, but it also has to take over Wi-Fi setup, updates, calibration and printing screens. **Started in [`screen/`](../screen/README.md)** (`plus4screen`).
+
+## Layout file (`UI/xindi_800_480.HMI`)
+
+The TJC project file in this repository can be read without the TJC editor; [`tools/hmi_dump.py`](../tools/hmi_dump.py) does so, and [`screen/LAYOUT.md`](../screen/LAYOUT.md) is its output.
+
+- The page order in `main.HMI` matches the page numbers found in `xindi` (3 main, 35 control, 37 pre_load, 39 pre_heat, 40 unload, 41 load, 113 zero_box_page). This answers the "real page order is unknown" note above.
+- Buttons report themselves with their own code: `prints 0x65,1`, `prints dp,1`, `prints <n>,1`, then `0xff` three times. There is no touch-type byte, and `<n>` is not always the TJC object id. For example, all three heater buttons on page 35 report 3 and set `sys0` to 0/1/2 first.
+- Sliders and keypads send `prints 113,1` (`0x71`), page, widget and a 2-byte value, **without** `FF FF FF`:
+  - fan sliders (page 58): page 35, widgets 22/23/24;
+  - temperature keypad OK (page 36): page 35, widget 0/1/2 by heater;
+  - print keypad (page 18): page 17, widget 2 (flow) / 3 (speed).
+- Every page's `sleep_mode` timer sends `65 2B 01 FF FF FF` ("page 43, widget 1") when the screen should sleep.
+- The boot page sends a single byte `0x91` (`printh 91`) and restarts the screen after a timeout unless the host opens another page.
+- Pictures (`.is` entries) are PNG files after a short header; their numbers follow the `N.i` order in `main.HMI`.
 
 ## Files on this Mac (not in the repository)
 
