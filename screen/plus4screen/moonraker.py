@@ -103,6 +103,26 @@ class Moonraker:
         result = self._request("GET", "/machine/system_info") or {}
         return result.get("system_info", {})
 
+    def last_job(self):
+        """Most recent job from the print history, or None."""
+        result = self._request("GET", "/server/history/list",
+                               params={"limit": 1, "order": "desc"}) or {}
+        jobs = result.get("jobs") or []
+        return jobs[0] if jobs else None
+
+    def download(self, root, path):
+        """Raw bytes of a file in a Moonraker root, e.g. a thumbnail."""
+        url = "%s/server/files/%s/%s" % (
+            self.url, root, urllib.parse.quote(path))
+        try:
+            with self.opener.open(url, timeout=self.timeout) as resp:
+                return resp.read()
+        except urllib.error.HTTPError as exc:
+            raise MoonrakerError("HTTP %d for %s" % (exc.code, path),
+                                 True) from None
+        except (urllib.error.URLError, OSError) as exc:
+            raise MoonrakerError(str(exc)) from None
+
     def gcode_store(self, count=100):
         """Recent console lines: [{"message", "time", "type"}, ...]."""
         result = self._request("GET", "/server/gcode_store",

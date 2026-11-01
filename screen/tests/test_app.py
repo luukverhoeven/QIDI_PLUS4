@@ -41,6 +41,12 @@ class FakeMoonraker:
     def metadata(self, filename):
         return {"estimated_time": 3600}
 
+    def last_job(self):
+        return None
+
+    def download(self, root, path):
+        raise MoonrakerError("not found", True)
+
 
 class ManualRunner:
     """Runs jobs only when the test says so, like a slow printer."""

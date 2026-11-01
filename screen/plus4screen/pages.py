@@ -75,6 +75,7 @@ W_RIGHT = 9              # stock "Back"
 # MAIN (page 3)
 W_WIFI = 1
 W_ESTOP = 2
+W_LAST_PRINT = 3         # the picture of the last print (cp0 / b3)
 
 # PRINTING (page 17) and PRINT_KB (page 18, keypad over the print page)
 W_PRINT_STOP = 0

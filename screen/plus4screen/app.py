@@ -13,6 +13,7 @@ import threading
 from . import pages as P
 from . import tjc
 from .moonraker import MoonrakerError
+from .pictures import PicturesMixin
 from .printer import FANS, OBJECTS, PrinterState, hhmm
 from .settings import SettingsMixin
 from .tools import ToolsMixin
@@ -89,7 +90,7 @@ class ThreadRunner:
                 on_done(result, error)
 
 
-class App(SettingsMixin, ToolsMixin):
+class App(SettingsMixin, ToolsMixin, PicturesMixin):
     def __init__(self, write, moonraker, runner, lang=None,
                  dry_run=False):
         self.write = write
@@ -119,6 +120,11 @@ class App(SettingsMixin, ToolsMixin):
         self.confirm_action = None
         self.tool_job = None
         self.zstep = 0.01
+
+        self.pictures = {}              # filename -> ColPic text or None
+        self.pictures_pending = {}      # filename -> callbacks
+        self.last_print = None
+        self.reset_pictures()
 
     # Screen output --------------------------------------------------------
 
@@ -254,6 +260,7 @@ class App(SettingsMixin, ToolsMixin):
             self.value(event.page, event.widget, event.value)
         elif event.kind == tjc.BOOT:
             log.info("screen booted")
+            self.reset_pictures()
             self.start()
         elif event.kind == tjc.STATUS:
             log.debug("screen status 0x%02x", event.value)
@@ -344,8 +351,15 @@ class App(SettingsMixin, ToolsMixin):
 
     # Page: MAIN -----------------------------------------------------------
 
+    def enter_main(self):
+        self.show_last_print()
+
     def touch_main(self, widget):
-        if widget == P.W_ESTOP:
+        if widget == P.W_LAST_PRINT:
+            if self.last_print:
+                self.selected = self.last_print
+                self.goto(P.PREVIEW)
+        elif widget == P.W_ESTOP:
             log.warning("emergency stop from the screen")
             self.action("emergency stop", self.mr.emergency_stop)
         elif widget == P.W_WIFI:
@@ -533,6 +547,7 @@ class App(SettingsMixin, ToolsMixin):
     def enter_printing(self):
         self.set_txt("t5", os.path.basename(self.state.filename))
         self.set_txt("t11", "mm/s")
+        self.show_printing_picture()
 
     def touch_printing(self, widget):
         state = self.state
@@ -623,6 +638,8 @@ class App(SettingsMixin, ToolsMixin):
         if self.selected and self.selected not in self.estimate:
             self.estimate[self.selected] = None
             self._fetch_estimate(self.selected)
+        if self.selected:
+            self.show_preview_picture(self.selected)
 
     def touch_preview(self, widget):
         if widget == P.W_PREVIEW_BACK:
@@ -709,6 +726,7 @@ class App(SettingsMixin, ToolsMixin):
         return "Ready"
 
     ENTER = {
+        P.MAIN: enter_main,
         P.CONTROL: enter_control,
         P.PRE_HEAT: enter_pre_heat,
         P.UNLOAD: enter_unload,
