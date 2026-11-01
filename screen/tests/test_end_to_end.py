@@ -77,7 +77,7 @@ class EndToEndTest(unittest.TestCase):
 
     def test_touch_to_gcode(self):
         data = self.read_until(b"n0.val=210\xff\xff\xff")
-        self.assertIn(b"lang=2\xff\xff\xffpage 3\xff\xff\xff", data)
+        self.assertTrue(data.startswith(b"page 3\xff\xff\xff"))
         os.write(self.master, b"\x65\x03\x22\xff\xff\xff")   # Control
         self.read_until(b"page 35\xff\xff\xff")
         os.write(self.master, b"\x65\x23\x0a\xff\xff\xff")   # Home

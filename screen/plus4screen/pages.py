@@ -6,6 +6,9 @@ Widget numbers are the numbers the widgets *report* in touch events,
 which are not always their TJC object ids.
 """
 
+GRAY = 38066     # pco of an inactive label, from the layout
+WHITE = 65535
+
 LOGO = 0
 MAIN = 3
 FILE_LIST = 4
@@ -99,3 +102,63 @@ W_NO = 1
 
 # SCREEN_SLEEP: every page's sleep timer sends "65 2B 01 FF FF FF".
 SLEEP_EVENT = (SCREEN_SLEEP, 1)
+
+# PRINT_ZOFFSET (page 19): Z offset during a print. Widgets 0-3 and 5
+# work as on PRINTING.
+PRINT_ZOFFSET = 19
+W_PRINT_ZOFFSET = 4      # on PRINTING: open PRINT_ZOFFSET
+W_ZOFFSET_STEP = {6: 0.01, 7: 0.05, 8: 0.1, 9: 0.5}
+W_ZOFFSET_DOWN = 10      # SET_GCODE_OFFSET Z_ADJUST=-step
+W_ZOFFSET_UP = 11        # SET_GCODE_OFFSET Z_ADJUST=+step
+W_ZOFFSET_BACK = 12
+ZOFFSET_STEP_PICC = ((70, 72), (71, 71))   # (picc, picc2) normal, selected
+
+# Settings tab (navigation widget 37). The left column is the same on
+# every settings page: 0 language, 1 network, 2 system, 4 versions, 5 more.
+BOOT_SPLASH = 1          # full-screen picture shown while rebooting
+POWER_OFF = 2            # full-screen picture shown while shutting down
+LANGUAGE = 21            # language buttons work on the screen itself
+SYSTEM_OK = 29
+SYSTEM_ERR = 30          # Klipper in shutdown/error; t6 = its message
+SLEEP_SET = 31           # sleep buttons work on the screen itself
+UPDATE = 32              # used to show versions
+MORE = 33
+SERVICE = 34             # static QR code
+NETWORK = 62
+LANGUAGE_2 = 69
+CONFIRM = 94             # t0 question, b0 yes, b1 no
+SETTINGS_PAGES = (LANGUAGE, SYSTEM_OK, SYSTEM_ERR, SLEEP_SET, UPDATE, MORE,
+                  SERVICE, NETWORK, LANGUAGE_2)
+W_SET_COLUMN = {0: LANGUAGE, 1: NETWORK, 4: UPDATE, 5: MORE}
+W_SET_SYSTEM = 2
+W_MORE_SLEEP = 3
+W_MORE_SERVICE = 6
+W_MORE_REBOOT = 8        # stock: factory reset; here: restart the printer
+W_SYS_SHUTDOWN = 6       # stock: export logs; here: shut the printer down
+W_SYS_KLIPPER_RESTART = 7
+W_SYS_FIRMWARE_RESTART = 8
+W_CONFIRM_YES = 0
+W_CONFIRM_NO = 1
+NET_TAB_PICC = ((248, 245), (249, 249))   # (picc, picc2) inactive, active
+NETWORK_HIDE = ("b8", "b9", "b10", "t8", "b20", "b21", "b22")
+
+# Tools tab (navigation widget 36).
+TOOL_SELECT = 95
+SHAPER = 8
+SHAPER_RUNNING = 9
+SHAPER_DONE = 59
+LEVEL = 14
+LEVEL_RUNNING = 15
+LEVEL_DONE = 61
+LEVEL_WARNING = 73
+W_TOOL_SCREWS = 0        # bed screws: not implemented
+W_TOOL_LEVEL = 1
+W_TOOL_SHAPER = 2
+W_SHAPER_START = 3
+W_SHAPER_BACK = 4
+W_LEVEL_TEMP = 4         # 0x71 frame from the bed temperature keypad
+W_LEVEL_BACK = 6
+W_DONE_OK = 3            # SHAPER_DONE and LEVEL_DONE
+W_WARNING_OK = 0
+LEVEL_BED_MIN = 35
+LEVEL_BED_MAX = 120

@@ -109,12 +109,20 @@ class AppTest(unittest.TestCase):
 
     # Start-up and navigation ---------------------------------------------
 
-    def test_start_sets_language_and_shows_main(self):
+    def test_start_keeps_screen_language_and_shows_main(self):
         cmds = self.sent()
-        self.assertEqual(cmds[:2], ["lang=2", "page 3"])
+        self.assertEqual(cmds[0], "page 3")
+        self.assertFalse([c for c in cmds if c.startswith("lang=")])
         self.assertIn("n0.val=25", cmds)
         self.assertIn("n1.val=60", cmds)
         self.assertIn('t3.txt="Ready"', cmds)
+
+    def test_start_forces_language_when_given(self):
+        app = App(self.out.append, self.mr, self.runner, lang=2)
+        app.update(PrinterState(status()))
+        self.sent()
+        app.start()
+        self.assertEqual(self.sent()[:2], ["lang=2", "page 3"])
 
     def test_unchanged_values_are_not_resent(self):
         self.sent()
@@ -124,7 +132,7 @@ class AppTest(unittest.TestCase):
     def test_boot_event_reinitialises(self):
         self.sent()
         self.app.handle(tjc.Event(tjc.BOOT))
-        self.assertEqual(self.sent()[:2], ["lang=2", "page 3"])
+        self.assertEqual(self.sent()[0], "page 3")
 
     def test_nav_bar(self):
         self.touch(P.MAIN, P.NAV_CONTROL)

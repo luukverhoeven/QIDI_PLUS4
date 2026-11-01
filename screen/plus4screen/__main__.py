@@ -8,7 +8,7 @@ import sys
 import time
 
 from . import __version__
-from .app import ENGLISH, App, ThreadRunner
+from .app import App, ThreadRunner
 from .moonraker import Moonraker
 from .tjc import Decoder, SerialPort
 
@@ -23,8 +23,10 @@ def parse_args(argv):
                    help="serial port of the screen (default: %(default)s)")
     p.add_argument("--moonraker", default="http://127.0.0.1:7125",
                    help="Moonraker URL (default: %(default)s)")
-    p.add_argument("--lang", type=int, default=ENGLISH,
-                   help="screen language index, 2 = English (default)")
+    p.add_argument("--lang", type=int, default=None,
+                   help="force the screen language index (2 = English); "
+                        "by default the language chosen on the screen is "
+                        "kept")
     p.add_argument("--poll", type=float, default=1.0,
                    help="seconds between status updates (default: 1)")
     p.add_argument("--dry-run", action="store_true",

@@ -14,6 +14,8 @@ from . import pages as P
 from . import tjc
 from .moonraker import MoonrakerError
 from .printer import FANS, OBJECTS, PrinterState, hhmm
+from .settings import SettingsMixin
+from .tools import ToolsMixin
 
 log = logging.getLogger("plus4screen")
 
@@ -22,8 +24,8 @@ log = logging.getLogger("plus4screen")
 # 4 French, 5 German, 6 Italian, 7 Spanish, 9 Portuguese.
 ENGLISH = 2
 
-GRAY = 38066     # pco of an inactive label, from the layout
-WHITE = 65535
+GRAY = P.GRAY
+WHITE = P.WHITE
 
 JOG_FEED = {"X": 6000, "Y": 6000, "Z": 600}
 EXTRUDE_FEED = 300
@@ -87,8 +89,8 @@ class ThreadRunner:
                 on_done(result, error)
 
 
-class App:
-    def __init__(self, write, moonraker, runner, lang=ENGLISH,
+class App(SettingsMixin, ToolsMixin):
+    def __init__(self, write, moonraker, runner, lang=None,
                  dry_run=False):
         self.write = write
         self.mr = moonraker
@@ -112,6 +114,12 @@ class App:
         self.selected = None
         self.estimate = {}              # filename -> slicer estimate (s)
 
+        self.set_page = P.MORE          # last settings page
+        self.confirm_return = P.MORE
+        self.confirm_action = None
+        self.tool_job = None
+        self.zstep = 0.01
+
     # Screen output --------------------------------------------------------
 
     def send(self, command):
@@ -131,6 +139,13 @@ class App:
     def set_val(self, obj, value):
         self.set_attr(obj, "val", int(round(value)))
 
+    def set_vis(self, obj, visible):
+        key = (obj, "vis")
+        if self.shown.get(key) == bool(visible):
+            return
+        self.shown[key] = bool(visible)
+        self.send("vis %s,%d" % (obj, 1 if visible else 0))
+
     def set_txt(self, obj, text):
         self.set_attr(obj, "txt", text)
 
@@ -146,8 +161,13 @@ class App:
         self.refresh()
 
     def start(self):
-        """(Re)initialise the screen, e.g. after it booted."""
-        self.send("lang=%d" % self.lang)
+        """(Re)initialise the screen, e.g. after it booted.
+
+        The screen keeps its own language (set on its language page and
+        stored with ``wepo``); only override it when ``--lang`` was given.
+        """
+        if self.lang is not None:
+            self.send("lang=%d" % self.lang)
         self.goto(P.PRINTING if self.state.busy_printing else P.MAIN)
 
     # Printer interaction --------------------------------------------------
@@ -193,6 +213,7 @@ class App:
         self._follow_print(old, state)
         self._follow_job(state)
         self.refresh()
+        self.follow_tool_job()
 
     def _follow_print(self, old, new):
         if new.filename and new.filename not in self.estimate:
@@ -202,15 +223,15 @@ class App:
         if was == now:
             return
         log.info("print state %s -> %s", was, now)
+        print_pages = (P.PRINTING, P.PRINT_KB, P.PRINT_STOP, P.PRINT_ZOFFSET)
         if now == "printing" and self.page in (P.MAIN, P.FILE_LIST,
                                                P.PREVIEW):
             self.goto(P.PRINTING)
-        elif now == "complete" and self.page in (P.PRINTING, P.PRINT_KB,
-                                                 P.PRINT_STOP):
+        elif now == "complete" and self.page in print_pages:
             self.goto(P.PRINT_FINISH)
             self.set_txt("t1", hhmm(new.print_duration))
-        elif now in ("cancelled", "error", "standby") and self.page in (
-                P.PRINTING, P.PRINT_KB, P.PRINT_STOP):
+        elif now in ("cancelled", "error", "standby") and (
+                self.page in print_pages):
             self.goto(P.MAIN)
 
     def _fetch_estimate(self, filename):
@@ -263,8 +284,10 @@ class App:
             self.go_control()
         elif widget == P.NAV_FILES:
             self.goto(P.FILE_LIST)
-        elif widget in (P.NAV_TOOLS, P.NAV_SETTINGS):
-            log.info("tools/settings are not implemented, use Fluidd")
+        elif widget == P.NAV_TOOLS:
+            self.go_tools()
+        elif widget == P.NAV_SETTINGS:
+            self.go_settings()
         else:
             return False
         return True
@@ -294,6 +317,8 @@ class App:
                 self.gcode("M220 S%d" % value)
             if self.page == P.PRINT_KB:
                 self.goto(P.PRINTING)
+        elif page == P.LEVEL and widget == P.W_LEVEL_TEMP:
+            self.level_value(value)
 
     # Shared control column -----------------------------------------------
 
@@ -347,8 +372,8 @@ class App:
             self.show_step()
         elif widget in P.W_JOG or widget in P.W_EXTRUDER or widget in (
                 P.W_HOME, P.W_MOTORS_OFF):
-            if self.state.busy_printing:
-                log.info("movement blocked while printing")
+            if self.state.busy_printing or self.tool_running:
+                log.info("movement blocked while printing or calibrating")
                 return
             if widget in P.W_JOG:
                 axis, sign = P.W_JOG[widget]
@@ -436,6 +461,9 @@ class App:
         if self.state.busy_printing:
             self.show_error("Pause or finish the print first.")
             return
+        if self.tool_running:
+            self.show_error("Wait for the calibration to finish.")
+            return
         job = self.job = Job(kind, self.temp)
         self.goto(P.UNLOAD if kind == "unload" else P.LOAD)
         macro = "UNLOAD_FILAMENT" if kind == "unload" else "LOAD_FILAMENT"
@@ -520,6 +548,8 @@ class App:
                        % (0 if state.caselight else 1))
         elif widget in (P.W_PRINT_FLOW, P.W_PRINT_SPEED):
             self.goto(P.PRINT_KB)       # the screen already set sys0
+        elif widget == P.W_PRINT_ZOFFSET:
+            self.goto(P.PRINT_ZOFFSET)
         else:
             return False
 
@@ -545,9 +575,9 @@ class App:
 
     def enter_file_list(self):
         self.render_files()
-        # The page's load event runs "tsw 255,0" (all touch off) and only
-        # its timer, which the host never starts here, turns it back on.
-        # xindi sends "tsw 255,1" itself once the list is filled.
+        # The page's load event runs "tsw 255,0" (all touch off); its
+        # timer tm0 only turns touch back on after 30 s. xindi sends
+        # "tsw 255,1" itself once the list is filled.
         self.send("tsw 255,1")
 
         def done(files, error):
@@ -637,6 +667,12 @@ class App:
             self.refresh_printing(s)
         elif page == P.PRINT_KB:
             self.refresh_print_common(s)
+        elif page == P.PRINT_ZOFFSET:
+            self.refresh_print_zoffset()
+        elif page == P.LEVEL_RUNNING:
+            self.refresh_level()
+        elif page in (P.SYSTEM_OK, P.SYSTEM_ERR):
+            self.refresh_system()
 
     def refresh_printing(self, s):
         for i in range(3):
@@ -679,6 +715,8 @@ class App:
         P.PRINTING: enter_printing,
         P.FILE_LIST: enter_file_list,
         P.PREVIEW: enter_preview,
+        **SettingsMixin.SETTINGS_ENTER,
+        **ToolsMixin.TOOLS_ENTER,
     }
     TOUCH = {
         P.MAIN: touch_main,
@@ -699,8 +737,11 @@ class App:
         P.PREVIEW: touch_preview,
         P.SCREEN_SLEEP: touch_sleep,
         P.GCODE_ERROR: touch_error,
+        **SettingsMixin.SETTINGS_TOUCH,
+        **ToolsMixin.TOOLS_TOUCH,
     }
     # Pages without the navigation bar: widget numbers 33-37 mean
     # something else there (or nothing).
     NO_NAV = (P.SCREEN_SLEEP, P.GCODE_ERROR, P.PRINT_STOP, P.PRINT_FINISH,
-              P.LOGO)
+              P.LOGO, P.BOOT_SPLASH, P.POWER_OFF, P.CONFIRM, P.LEVEL_WARNING,
+              P.LEVEL_DONE, P.SHAPER_DONE)

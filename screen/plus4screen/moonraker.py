@@ -78,13 +78,45 @@ class Moonraker:
         self._request("POST", "/printer/print/start",
                       params={"filename": filename})
 
+    def restart(self):
+        """Klipper host restart (G-code RESTART)."""
+        self._request("POST", "/printer/restart")
+
+    def firmware_restart(self):
+        self._request("POST", "/printer/firmware_restart")
+
+    def machine_reboot(self):
+        self._request("POST", "/machine/reboot")
+
+    def machine_shutdown(self):
+        self._request("POST", "/machine/shutdown")
+
+    # Information --------------------------------------------------------
+
+    def printer_info(self):
+        return self._request("GET", "/printer/info") or {}
+
+    def server_info(self):
+        return self._request("GET", "/server/info") or {}
+
+    def system_info(self):
+        result = self._request("GET", "/machine/system_info") or {}
+        return result.get("system_info", {})
+
+    def gcode_store(self, count=100):
+        """Recent console lines: [{"message", "time", "type"}, ...]."""
+        result = self._request("GET", "/server/gcode_store",
+                               params={"count": count}) or {}
+        return result.get("gcode_store", [])
+
     # Files --------------------------------------------------------------
 
     def list_files(self):
         files = self._request("GET", "/server/files/list",
                               params={"root": "gcodes"}) or []
         files = [f for f in files
-                 if f.get("path", "").lower().endswith((".gcode", ".g"))]
+                 if f.get("path", "").lower().endswith((".gcode", ".g"))
+                 and not is_hidden(f["path"])]
         files.sort(key=lambda f: f.get("modified", 0), reverse=True)
         return files
 
@@ -94,3 +126,9 @@ class Moonraker:
                                  params={"filename": filename}) or {}
         except MoonrakerError:
             return {}
+
+
+def is_hidden(path):
+    """True for files inside hidden folders such as QIDI's ``.cache``
+    and ``.plr`` (power-loss recovery copies)."""
+    return any(part.startswith(".") for part in path.split("/")[:-1])
