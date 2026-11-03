@@ -412,6 +412,21 @@ class UITest(unittest.TestCase):
         self.assertLess(self.sent.index("vis exp3,0"),
                         self.sent.index("pic 0,0,%d" % LAYOUT["move"].bg))
 
+    def test_picture_sides_are_whole_jpeg_blocks(self):
+        # The screen decodes a JPEG wrongly unless its sides are whole
+        # 16 px blocks: Home's 228 px slot gets a 224 px picture, centred.
+        self.with_thumbnails()
+        self.app.show("home")
+        for _ in range(2):          # the first call makes the picture
+            self.app.thumbs.show("home", "last", "a.gcode")
+        while self.app.thumbs.pump():
+            pass
+        self.assertEqual(self.uploads[-1],
+                         ("ram/t0.jpg", b"JPEG 224 PNG .thumbs/x-300.png"))
+        x, y, _, _ = LAYOUT["home"].thumbs["last"].rect
+        self.assertIn("exp0.x=%d" % (x + 2), self.sent)
+        self.assertIn("exp0.y=%d" % (y + 2), self.sent)
+
     def test_thumbnail_is_not_uploaded_twice(self):
         self.with_thumbnails()
         self.app.show("files")

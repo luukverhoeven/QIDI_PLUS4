@@ -24,6 +24,10 @@ OBJECTS = {("home", "last"): 0, ("printing", "print"): 1,
 OBJECTS.update({("files", "file%d" % i): 3 + i for i in range(6)})
 JPEG_BACKGROUND = (46, 56, 70)        # the design's thumbnail tile
 JPEG_QUALITY = 85
+# The screen's decoder (TJC X2) draws a JPEG wrongly unless its sides are
+# whole 16 px blocks (4:2:0 colour): Home (228) and printing (212) get a
+# 224 and 208 px picture, centred on the slot's tile.
+BLOCK = 16
 RETRY_AFTER = 60.0     # s before a failed upload is tried again
 
 
@@ -38,6 +42,17 @@ def pick(metadata, size):
     best = min(big, key=lambda t: t["width"]) if big else \
         max(thumbs, key=lambda t: t.get("width", 0))
     return best["relative_path"]
+
+
+def picture_side(size):
+    return size - size % BLOCK
+
+
+def placed(rect):
+    """Where a picture for the slot ``rect`` goes: centred, whole blocks."""
+    x, y, w, h = rect
+    side = picture_side(w)
+    return (x + (w - side) // 2, y + (h - side) // 2, side, side)
 
 
 def make_jpeg(image_bytes, size):
@@ -98,7 +113,7 @@ class Thumbs:
                 return None
             folder = posixpath.dirname(path)
             image = mr.download("gcodes", posixpath.join(folder, rel))
-            return make_jpeg(image, size)
+            return make_jpeg(image, picture_side(size))
 
         def done(jpeg, error):
             self.building.discard(key)
@@ -137,6 +152,6 @@ class Thumbs:
                     return True
                 log.info("thumbnail written: %s (%s)", name, path)
                 self.in_ram[number] = key
-            app.canvas.thumb(number, rect, name, reload=written)
+            app.canvas.thumb(number, placed(rect), name, reload=written)
             return True
         return False

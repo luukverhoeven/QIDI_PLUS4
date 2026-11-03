@@ -60,7 +60,7 @@ Needs the TJC editor "USART HMI" (Windows; version 1.68.2 was used) and the Inte
    | exp2 | 272 x 272 | preview |
    | exp3–exp8 | 96 x 96 | files, cards 1–6 |
 
-   plus4screen moves and shows them; `w` and `h` cannot be changed at run time, so they must match the `data-thumb` slots of the design.
+   plus4screen moves and shows them; `w` and `h` cannot be changed at run time, so they must match the `data-thumb` slots of the design. The X2 decoder draws a JPEG wrongly unless its sides are whole 16 px blocks, so the 228 and 212 px slots get a 224 and 208 px picture, centred.
 5. `Program.s` must contain `baud=115200` and `sys2=<screen id>`; `build_assets.py` prints the id.
 6. Compile, then File → output production file, and copy `plus4ui.tft` to `build/`.
 
