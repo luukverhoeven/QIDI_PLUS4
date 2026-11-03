@@ -134,7 +134,7 @@ The TJC project file in this repository can be read without the TJC editor; [`to
 
 ## Analysis files (not in this repository)
 
-They hold QIDI's binary and code decompiled from it, so they stay out of this public repository. A copy is kept in the private repository `luukverhoeven/qidi-plus4-analysis`; the working copy is on the Mac.
+They hold QIDI's binary and code decompiled from it, so they stay out of this public repository. A copy is kept in the private repository [luukverhoeven/qidi-plus4-analysis](https://github.com/luukverhoeven/qidi-plus4-analysis); the working copy is on the Mac.
 
 - **Analysis folder:** `~/tools/analysis/xindi/` (a clone of that repository), with:
   - `xindi-plus4-20261019` (the binary)

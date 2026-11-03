@@ -16,7 +16,7 @@ Personal fork of [QIDITECH/QIDI_PLUS4](https://github.com/QIDITECH/QIDI_PLUS4) f
 | Touchscreen | `plus4screen` replaces QIDI's closed-source `xindi`: its own interface and screen file, thumbnails, Wi-Fi setup, single-spool load/unload. | [screen/README.md](screen/README.md) |
 | Wi-Fi control | `plus4-wifi-gate`, a small root service that passes only the Wi-Fi screen's commands to `wpa_supplicant`. | [screen/README.md](screen/README.md#own-interface) |
 | Klipper | The `klipper` submodule points to a snapshot of Klipper as it runs on the printer (`luukverhoeven/klipper`, branch `plus4-printer`). | |
-| Analysis | How `xindi` and the TJC screen work, found by reverse engineering. | [docs/xindi-screen-analysis.md](docs/xindi-screen-analysis.md) |
+| Analysis | How `xindi` and the TJC screen work, found by reverse engineering. The binary and decompiled code are in a private repository. | [docs/xindi-screen-analysis.md](docs/xindi-screen-analysis.md), [qidi-plus4-analysis](https://github.com/luukverhoeven/qidi-plus4-analysis) (private) |
 | Recovery | Reflashing the eMMC and installing V1.6.0. | [docs/emmc-reflash-v1.6.0.md](docs/emmc-reflash-v1.6.0.md) |
 
 Open items and ideas: [docs/improvements.md](docs/improvements.md).
