@@ -14,6 +14,8 @@ import io
 import logging
 import posixpath
 
+from .. import images
+
 log = logging.getLogger("plus4screen")
 
 # (screen, thumbnail slot in ui_layout.json) -> object number on the page.
@@ -41,7 +43,7 @@ def pick(metadata, size):
 def make_jpeg(image_bytes, size):
     """A ``size`` x ``size`` baseline JPEG of a (transparent) thumbnail."""
     from PIL import Image            # Pillow is on the printer, not required
-    image = Image.open(io.BytesIO(image_bytes)).convert("RGBA")
+    image = images.open_checked(image_bytes).convert("RGBA")
     image.thumbnail((size, size), Image.LANCZOS)
     tile = Image.new("RGB", (size, size), JPEG_BACKGROUND)
     offset = ((size - image.width) // 2, (size - image.height) // 2)

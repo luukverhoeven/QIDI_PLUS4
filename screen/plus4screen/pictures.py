@@ -16,6 +16,7 @@ import posixpath
 import subprocess
 import tempfile
 
+from . import images
 from . import pages as P
 
 log = logging.getLogger("plus4screen")
@@ -38,6 +39,7 @@ def pick_thumbnail(metadata):
 
 def make_colpic(image_bytes, suffix):
     """ColPic text for an image, using QIDI's converter."""
+    images.open_checked(image_bytes)
     with tempfile.TemporaryDirectory(prefix="plus4screen-") as tmp:
         image = os.path.join(tmp, "thumb" + suffix)
         out = os.path.join(tmp, "colpic.txt")

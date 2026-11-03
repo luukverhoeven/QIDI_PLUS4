@@ -1,6 +1,7 @@
+import io
 import unittest
 
-from plus4screen.moonraker import Moonraker
+from plus4screen.moonraker import MAX_DOWNLOAD, Moonraker, MoonrakerError
 
 
 class ListFilesTest(unittest.TestCase):
@@ -20,6 +21,26 @@ class ListFilesTest(unittest.TestCase):
         mr = Moonraker()
         mr._request = lambda *a, **k: {"estimated_time": 600}
         self.assertEqual(mr.metadata("a.gcode"), {"estimated_time": 600})
+
+
+class DownloadTest(unittest.TestCase):
+    class Opener:
+        def __init__(self, size):
+            self.size = size
+
+        def open(self, url, timeout=None):
+            return io.BytesIO(b"x" * self.size)
+
+    def test_returns_the_file(self):
+        mr = Moonraker()
+        mr.opener = self.Opener(100)
+        self.assertEqual(mr.download("gcodes", ".thumbs/a.png"), b"x" * 100)
+
+    def test_refuses_a_file_larger_than_the_limit(self):
+        mr = Moonraker()
+        mr.opener = self.Opener(MAX_DOWNLOAD + 1)
+        with self.assertRaises(MoonrakerError):
+            mr.download("gcodes", ".thumbs/a.png")
 
 
 if __name__ == "__main__":

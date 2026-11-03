@@ -5,6 +5,8 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
+MAX_DOWNLOAD = 2 * 1024 * 1024   # bytes; thumbnails are tens of KB
+
 
 class MoonrakerError(Exception):
     def __init__(self, message, reachable=False):
@@ -110,18 +112,23 @@ class Moonraker:
         jobs = result.get("jobs") or []
         return jobs[0] if jobs else None
 
-    def download(self, root, path):
-        """Raw bytes of a file in a Moonraker root, e.g. a thumbnail."""
+    def download(self, root, path, limit=MAX_DOWNLOAD):
+        """Raw bytes of a file in a Moonraker root, e.g. a thumbnail; a file
+        larger than ``limit`` bytes is refused."""
         url = "%s/server/files/%s/%s" % (
             self.url, root, urllib.parse.quote(path))
         try:
             with self.opener.open(url, timeout=self.timeout) as resp:
-                return resp.read()
+                data = resp.read(limit + 1)
         except urllib.error.HTTPError as exc:
             raise MoonrakerError("HTTP %d for %s" % (exc.code, path),
                                  True) from None
         except (urllib.error.URLError, OSError) as exc:
             raise MoonrakerError(str(exc)) from None
+        if len(data) > limit:
+            raise MoonrakerError("%s is larger than %d bytes" % (path, limit),
+                                 True)
+        return data
 
     def gcode_store(self, count=100):
         """Recent console lines: [{"message", "time", "type"}, ...]."""
