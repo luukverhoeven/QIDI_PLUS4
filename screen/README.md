@@ -22,7 +22,7 @@ Home, printing, files, file preview, move, filament (single spool), temperatures
 - **Speed:** the screen talks at 115200 baud. If it comes up at the TJC default of 9600, `plus4screen` switches it over at start.
 - **Screen check:** the screen file's ID (`sys2`) must match `ui_layout.json`; with another screen file, touches are ignored.
 
-Not done yet: bed screw adjustment.
+Not done yet: bed screw adjustment. More open items: [docs/improvements.md](../docs/improvements.md).
 
 How the design becomes `plus4ui.tft`: [`ui/README.md`](ui/README.md).
 

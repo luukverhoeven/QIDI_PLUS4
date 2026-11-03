@@ -5,10 +5,31 @@
 
 # About this fork
 
-Personal fork of [QIDITECH/QIDI_PLUS4](https://github.com/QIDITECH/QIDI_PLUS4) for running a Plus4 with a single external spool and no QIDI Box.
+Personal fork of [QIDITECH/QIDI_PLUS4](https://github.com/QIDITECH/QIDI_PLUS4) for a Plus4 that runs with a single external spool, no QIDI Box, and an open-source touchscreen program. `main` holds the fork's changes on top of QIDI's V1.7.1 and matches what the printer runs.
 
-- `main` tracks upstream. Changes live on the `single-spool` branch.
-- `config/` on `single-spool` starts from the configuration the printer runs after the online update past V1.7.1.
+## What this fork changes
+
+| Area | Change | Details |
+| --- | --- | --- |
+| Configuration | `config/` is the configuration the printer runs: QIDI's online update after V1.7.1, plus this printer's `printer.cfg` with its input shaper and bed meshes. | [Single-spool changes](#single-spool-changes) |
+| Single spool | Box logic off by default, `LOAD_FILAMENT` and `UNLOAD_FILAMENT` macros for Fluidd and the touchscreen. | [Single-spool changes](#single-spool-changes) |
+| Touchscreen | `plus4screen` replaces QIDI's closed-source `xindi`: its own interface and screen file, thumbnails, Wi-Fi setup, single-spool load/unload. | [screen/README.md](screen/README.md) |
+| Wi-Fi control | `plus4-wifi-gate`, a small root service that passes only the Wi-Fi screen's commands to `wpa_supplicant`. | [screen/README.md](screen/README.md#own-interface) |
+| Klipper | The `klipper` submodule points to a snapshot of Klipper as it runs on the printer (`luukverhoeven/klipper`, branch `plus4-printer`). | |
+| Analysis | How `xindi` and the TJC screen work, found by reverse engineering. | [docs/xindi-screen-analysis.md](docs/xindi-screen-analysis.md) |
+| Recovery | Reflashing the eMMC and installing V1.6.0. | [docs/emmc-reflash-v1.6.0.md](docs/emmc-reflash-v1.6.0.md) |
+
+Open items and ideas: [docs/improvements.md](docs/improvements.md).
+
+## On the printer
+
+What `screen/install.sh` and a few manual steps changed outside this repository:
+
+- **Services:** `plus4-screen` (the touchscreen program, own interface) and `plus4-wifi-gate` run from systemd. QIDI's `makerbase-client` (`xindi`) is stopped and disabled.
+- **Screen file:** `plus4ui.tft` is on the screen. QIDI's screen file is kept as `/home/mks/qidi-screen-backup.tft`; `screen/uninstall.sh` writes it back.
+- **Wi-Fi:** `wpa_supplicant`'s control socket is root-only (`ctrl_interface_group=0`, as QIDI ships it). The Wi-Fi screen goes through `/run/plus4-wifi/wlan0`.
+- **Time zone:** `Europe/Madrid` (CET/CEST), set with `sudo timedatectl set-timezone Europe/Madrid`. QIDI ships UTC.
+- **Box:** `enable_box = 0` in the live `saved_variables.cfg`.
 
 ## Single-spool changes
 
@@ -19,26 +40,25 @@ Personal fork of [QIDITECH/QIDI_PLUS4](https://github.com/QIDITECH/QIDI_PLUS4) f
   - `TEMP` (default `250`, same as stock) must be within the extruder's `min_extrude_temp` and `max_temp`.
   - Both refuse to run while printing. Pause the print first.
 
-With QIDI's closed-source screen program (`xindi`), the touchscreen keeps the Box loading screen.
+To switch Box logic off on a running printer without copying files, run `SAVE_VARIABLE VARIABLE=enable_box VALUE=0` from the Fluidd console. Use `VALUE=1` to switch it back on.
 
 ## Open-source touchscreen program
 
-[`screen/`](screen/README.md) holds `plus4screen`, an open-source replacement for `xindi`. It drives the built-in touchscreen with QIDI's existing pages, talks to Klipper through Moonraker, and turns the control page's filament button into a single-spool load/unload flow. Nothing is flashed onto the screen; `screen/uninstall.sh` gives the screen back to `xindi`. It has not been tested on a printer yet: start with `--dry-run`.
+[`screen/`](screen/README.md) holds `plus4screen`, an open-source replacement for `xindi`. It runs on the printer with its own interface: a design kept as HTML in [`screen/ui/design`](screen/ui/design), turned into the screen file `plus4ui.tft`, and drawn by `plus4screen` over the serial line. Home, printing, files with thumbnails, move, filament (single spool), temperatures, tools, settings and Wi-Fi are all on the screen. Install with `screen/install.sh`; `screen/uninstall.sh` gives the screen back to `xindi`.
 
 [`tools/hmi_dump.py`](tools/hmi_dump.py) reads QIDI's screen layout (`UI/xindi_800_480.HMI`) without the TJC editor. [`screen/LAYOUT.md`](screen/LAYOUT.md) is its map of every page and button.
 
-To switch Box logic off on a running printer without copying files, run `SAVE_VARIABLE VARIABLE=enable_box VALUE=0` from the Fluidd console. Use `VALUE=1` to switch it back on.
-
-To get the single-spool touchscreen back, reflash the eMMC and install V1.6.0: see [docs/emmc-reflash-v1.6.0.md](docs/emmc-reflash-v1.6.0.md).
-
 ## Keeping up with upstream
+
+`main` carries this fork's commits, so QIDI's updates are merged in rather than fast-forwarded:
 
 ```bash
 git remote add upstream https://github.com/QIDITECH/QIDI_PLUS4.git
 git fetch upstream
-git switch main && git merge --ff-only upstream/main && git push origin main
-git switch single-spool && git rebase main
+git switch main && git merge upstream/main && git push origin main
 ```
+
+A QIDI online update replaces `printer.cfg` (the old one is kept as `printer_{datetime}.cfg`) and can enable `makerbase-client` again. Afterwards, run `screen/install.sh --no-flash` and copy the changed configuration back into `config/`.
 
 # Documentation Guidelines
 
