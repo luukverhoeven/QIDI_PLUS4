@@ -127,7 +127,8 @@ class Thumbs:
                     continue
                 sent = app.upload(name, self.jpegs[key])
                 # Writing a file makes the screen repaint the page (see
-                # canvas.py): draw the live content again.
+                # canvas.py): let it, then draw the live content again.
+                app.canvas.settle()
                 app.canvas.repaint()
                 if not sent:
                     log.warning("thumbnail upload failed: %s", path)

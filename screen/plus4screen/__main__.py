@@ -14,6 +14,7 @@ from .tjc import Decoder, SerialPort, open_screen, write_file
 from .ui.app import UIApp
 
 QUIET_FLUSH = 0.05   # s of silence before a partial frame is decoded
+SETTLE = 0.05        # s the screen gets to start a page redraw (canvas.py)
 
 
 def parse_args(argv):
@@ -52,7 +53,8 @@ def run(args):
         def upload(name, data):
             return write_file(port, name, data)
         app = UIApp(port.write, Moonraker(args.moonraker), runner,
-                    dry_run=args.dry_run, upload=upload)
+                    dry_run=args.dry_run, upload=upload,
+                    settle=lambda: time.sleep(SETTLE))
     else:
         app = App(port.write, Moonraker(args.moonraker), runner,
                   lang=args.lang, dry_run=args.dry_run)

@@ -55,14 +55,15 @@ class Prefs(dict):
 
 class UIApp:
     def __init__(self, write, moonraker, runner, layout=None, dry_run=False,
-                 prefs_path=PREFS_PATH, clock=time.time, upload=None):
+                 prefs_path=PREFS_PATH, clock=time.time, upload=None,
+                 settle=None):
         self.write = write
         self.upload = upload          # (name, bytes) -> ok; see thumbs.py
         self.mr = moonraker
         self.runner = runner
         self.dry_run = dry_run
         self.clock = clock
-        self.canvas = Canvas(self.send, layout or Layout.load())
+        self.canvas = Canvas(self.send, layout or Layout.load(), settle)
         self.prefs = Prefs(prefs_path)
         self.state = PrinterState(online=False)
         self.screens = {}

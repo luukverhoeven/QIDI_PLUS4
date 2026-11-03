@@ -430,6 +430,45 @@ class UITest(unittest.TestCase):
         self.assertLess(self.sent.index("page1.pic=%d" % bg),
                         self.sent.index("pic 0,0,%d" % bg))
 
+    def test_screen_redraws_the_page_before_anything_is_drawn_on_it(self):
+        # Changing page1.pic makes the screen redraw the page once its
+        # input is empty; drawing sent before that would be wiped.
+        self.app.canvas.settle = lambda: self.sent.append("<settle>")
+        self.app.show("files")
+        bg = LAYOUT["files"].bg
+        at = self.sent.index("page1.pic=%d" % bg)
+        self.assertEqual(self.sent[at + 1], "<settle>")
+        self.assertLess(at + 1, self.sent.index("pic 0,0,%d" % bg))
+
+    def test_screen_redraws_the_page_before_the_upload_repaint(self):
+        self.with_thumbnails()
+        self.app.show("files")
+        self.app.canvas.settle = lambda: self.sent.append("<settle>")
+        self.sent.clear()
+        while self.app.thumbs.pump():
+            pass
+        empty = LAYOUT["files"].hit("file1").rect
+        fill = "fill %d,%d,%d,%d,%d" % (tuple(empty) + (BG,))
+        self.assertLess(self.sent.index("<settle>"), self.sent.index(fill))
+
+    def test_hidden_thumbnail_area_is_redrawn_before_it_is_painted(self):
+        self.with_thumbnails()
+        self.app.show("files")
+        while self.app.thumbs.pump():
+            pass
+        canvas = self.app.canvas
+        canvas.settle = lambda: self.sent.append("<settle>")
+        card = LAYOUT["files"].hit("file0").rect
+        self.sent.clear()
+        canvas.blank(card, BG)
+        self.assertEqual(self.sent[:3], [
+            "vis exp3,0", "<settle>",
+            "fill %d,%d,%d,%d,%d" % (tuple(card) + (BG,))])
+        canvas.thumb(3, LAYOUT["files"].thumbs["file0"].rect, "ram/t3.jpg")
+        self.sent.clear()
+        canvas.hide_thumb(3)
+        self.assertEqual(self.sent[:2], ["vis exp3,0", "<settle>"])
+
     def test_live_content_is_drawn_again_after_an_upload(self):
         # Writing a file makes the screen repaint the page from its
         # background picture, which wipes texts and blanked cards.

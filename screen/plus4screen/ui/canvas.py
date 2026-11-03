@@ -12,6 +12,10 @@ written to it: from the page's own background picture, then the thumbnail
 objects, wiping everything drawn here. So page 1 has a picture background
 (``sta`` 2) that follows the screen shown (``page1.pic``), and ``repaint``
 draws the live content again after each upload.
+
+Such a redraw (also the one a change of ``page1.pic`` asks for) runs only
+once the screen has worked through all commands it has received. Drawing
+sent straight after would be wiped, so ``settle`` pauses first.
 """
 
 from .. import tjc
@@ -33,9 +37,12 @@ def inside(a, b):
 
 
 class Canvas:
-    def __init__(self, send, layout):
+    def __init__(self, send, layout, settle=None):
         self.send = send
         self.layout = layout
+        # Lets the screen run a pending page redraw (time.sleep on the
+        # printer, nothing in tests).
+        self.settle = settle or (lambda: None)
         self.screen = None
         self.page = None
         self.pressed = None          # hit id drawn pressed
@@ -67,6 +74,7 @@ class Canvas:
         self.dots = {}
         self.fills = []
         self.send("page%d.pic=%d" % (CANVAS_PAGE, self.screen.bg))
+        self.settle()
         self.send("pic 0,0,%d" % self.screen.bg)
 
     def forget(self):
@@ -137,14 +145,18 @@ class Canvas:
         shown = self.objects.pop(number, None)
         if shown is not None:
             self.send("vis exp%d,0" % number)
+            self.settle()            # the screen redraws the area first
             self._restore(shown[0])
 
     def blank(self, rect, color):
         """Paint over a region and forget the live content drawn in it."""
-        for number in [n for n, (r, _) in self.objects.items()
-                       if intersects(r, rect)]:
+        hidden = [n for n, (r, _) in self.objects.items()
+                  if intersects(r, rect)]
+        for number in hidden:
             self.send("vis exp%d,0" % number)
             del self.objects[number]
+        if hidden:
+            self.settle()            # the screen redraws the area first
         self.fill(rect, color)
         self.fills.append((tuple(rect), color))
         for cache, items in ((self.texts, self.screen.texts),
