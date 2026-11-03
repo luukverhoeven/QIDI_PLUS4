@@ -132,11 +132,13 @@ The TJC project file in this repository can be read without the TJC editor; [`to
 - The boot page sends a single byte `0x91` (`printh 91`) and restarts the screen after a timeout unless the host opens another page.
 - Pictures (`.is` entries) are PNG files after a short header; their numbers follow the `N.i` order in `main.HMI`.
 
-## Files on this Mac (not in the repository)
+## Analysis files (not in this repository)
 
-- **Analysis folder:** `~/tools/analysis/xindi/`, with:
+They hold QIDI's binary and code decompiled from it, so they stay out of this public repository. A copy is kept in the private repository `luukverhoeven/qidi-plus4-analysis`; the working copy is on the Mac.
+
+- **Analysis folder:** `~/tools/analysis/xindi/` (a clone of that repository), with:
   - `xindi-plus4-20261019` (the binary)
-  - `pc-app/` and `pc-app2/` (Ghidra pseudocode for Ghidra address ranges `0x560000`–`0x7b0000` and `0x7b0000`–`0x8b0000`, about 20,600 functions)
+  - `pc-app/` and `pc-app2/` (Ghidra pseudocode for Ghidra address ranges `0x560000`–`0x7b0000` and `0x7b0000`–`0x8b0000`, 23,775 functions)
   - `name_to_file.json` (function name → pseudocode file)
   - `pc-app.manifest.json` and `pc-app2.manifest.json` (REA Evidence records)
 - **REA Evidence ID** (first pass): `ev_66b19048c16091f0022b05e18077e5a39ae911d999bd317630b62d52996015b4`.
