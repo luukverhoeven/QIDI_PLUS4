@@ -31,7 +31,6 @@ Things that could still be tweaked or improved, roughly by value. Each item says
 - **Fluidd build.** `fluidd/` is the same version as on the printer (v1.30.4) but a different build: other asset names in `index.html`.
 - **Line endings in the Klipper snapshot.** The printer's Klipper files use CRLF; the snapshot stores LF. Content is the same.
 - **Tests in CI.** `cd screen && python3 -m unittest discover -s tests` could run on every push with GitHub Actions. The Pillow tests need `pip install pillow`.
-- **Old branches.** `single-spool`, `single-spool-j6h54i` and `ui-redesign` are all in `main` now, and draft PR #1 is superseded. They can be closed and deleted.
 
 ## Done
 
@@ -42,3 +41,4 @@ For reference, from the work on the own interface:
 - Page redraws by the screen no longer wipe text: picture background that follows the screen, a pause before drawing, live content drawn again after uploads.
 - Wi-Fi setup through an allowlist gate instead of opening `wpa_supplicant` to `netdev`; one request per connection with a deadline.
 - Time zone set to `Europe/Madrid`.
+- All work merged into `main`; the old branches are deleted and draft PR #1 is closed.
