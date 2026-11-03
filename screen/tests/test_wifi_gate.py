@@ -63,6 +63,29 @@ class AllowlistTest(unittest.TestCase):
         self.assertEqual(reply, b"OK\n")
 
 
+class DeadlineTest(unittest.TestCase):
+    class Trickle:
+        """A client that sends one byte every half second, forever."""
+
+        def __init__(self, clock):
+            self.clock = clock
+
+        def settimeout(self, seconds):
+            self.timeout = seconds
+
+        def recv(self, size):
+            self.clock[0] += 0.5
+            return b"S"
+
+    def test_slow_client_is_cut_off_after_the_deadline(self):
+        clock = [0.0]
+        conn = self.Trickle(clock)
+        with self.assertRaises(socket.timeout):
+            wifi_gate.read_request(conn, timeout=2.0,
+                                   clock=lambda: clock[0])
+        self.assertLessEqual(clock[0], 2.5)
+
+
 class RoundTripTest(unittest.TestCase):
     """Wpa -> gate -> wpa_supplicant over real unix sockets."""
 

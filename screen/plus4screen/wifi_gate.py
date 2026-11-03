@@ -18,12 +18,13 @@ import os
 import re
 import socket
 import sys
+import time
 
 WPA = "/var/run/wpa_supplicant/wlan0"
 GATE = "/run/plus4-wifi/wlan0"
 GROUP = "netdev"             # may use the gate; mks is a member
 TIMEOUT = 4.0                # s to wait for wpa_supplicant
-CLIENT_TIMEOUT = 2.0         # s a client may take to send its request
+CLIENT_TIMEOUT = 2.0         # s a client may take for its whole request
 MAX_REQUEST = 256            # bytes
 REFUSED = "FAIL-GATE-REFUSED"
 NO_WIFI = "FAIL-GATE-NO-WIFI"
@@ -86,10 +87,17 @@ def answer(data, forward=forward):
     return forward(command)
 
 
-def read_request(conn):
-    """Up to MAX_REQUEST + 1 bytes, until the client shuts its side."""
+def read_request(conn, timeout=CLIENT_TIMEOUT, clock=time.monotonic):
+    """Up to MAX_REQUEST + 1 bytes, until the client shuts its side. The
+    whole request must arrive within ``timeout``, so a client sending a
+    byte now and then cannot hold the gate."""
+    end = clock() + timeout
     data = b""
     while len(data) <= MAX_REQUEST:
+        left = end - clock()
+        if left <= 0:
+            raise socket.timeout("request took too long")
+        conn.settimeout(left)
         chunk = conn.recv(MAX_REQUEST + 1 - len(data))
         if not chunk:
             break
@@ -123,9 +131,9 @@ def serve(gate=GATE, group=GROUP, wpa=WPA, count=None, ready=None):
                 count -= 1
             with conn:
                 try:
-                    conn.settimeout(CLIENT_TIMEOUT)
                     reply = answer(read_request(conn),
                                    lambda c: forward(c, wpa, local_dir))
+                    conn.settimeout(CLIENT_TIMEOUT)
                     conn.sendall(reply)
                 except OSError as exc:
                     log.warning("request failed: %s", exc)
