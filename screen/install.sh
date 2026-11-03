@@ -21,6 +21,8 @@ TFT="$SRC/ui/build/plus4ui.tft"
 BACKUP=/home/mks/qidi-screen-backup.tft
 WPA_CONF=/etc/wpa_supplicant/wpa_supplicant-wlan0.conf
 WPA_UNIT=makerbase-wlan0.service
+GATE_UNIT=plus4-wifi-gate.service
+GATE_DIR=/usr/local/lib/plus4screen
 
 mode=plus4
 flash=1
@@ -111,14 +113,27 @@ if [ "$mode" = plus4 ]; then
 fi
 
 if [ "$mode" = plus4 ]; then
-    # The Wi-Fi screen talks to wpa_supplicant's control socket. Let the
-    # netdev group (mks is a member) use it; QIDI's file has group 0.
-    if sudo grep -q '^ctrl_interface_group=0$' "$WPA_CONF" 2>/dev/null; then
-        sudo cp -p "$WPA_CONF" "$WPA_CONF.plus4screen-backup"
-        sudo sed -i 's/^ctrl_interface_group=0$/ctrl_interface_group=netdev/' \
+    # The Wi-Fi screen talks to plus4-wifi-gate, which passes on only the
+    # screen's own commands to wpa_supplicant (whose socket stays root-only:
+    # it also takes commands that load a library as root). The gate runs
+    # as root from a copy only root can change.
+    sudo install -d -o root -g root -m 0755 "$GATE_DIR"
+    sudo install -o root -g root -m 0644 "$SRC/plus4screen/wifi_gate.py" \
+        "$GATE_DIR/wifi_gate.py"
+    sudo install -o root -g root -m 0644 "$SRC/systemd/$GATE_UNIT" \
+        "/etc/systemd/system/$GATE_UNIT"
+    sudo systemctl daemon-reload
+    sudo systemctl enable "$GATE_UNIT"
+    sudo systemctl restart "$GATE_UNIT"
+    echo "Wi-Fi control: through $GATE_UNIT"
+    # An earlier version let group netdev use wpa_supplicant's socket.
+    if sudo grep -q '^ctrl_interface_group=netdev$' "$WPA_CONF" 2>/dev/null
+    then
+        sudo sed -i 's/^ctrl_interface_group=netdev$/ctrl_interface_group=0/' \
             "$WPA_CONF"
-        echo "Wi-Fi control: allowed for group netdev. Wi-Fi restarts in a few"
-        echo "seconds ($WPA_UNIT); the connection drops briefly."
+        sudo rm -f "$WPA_CONF.plus4screen-backup"
+        echo "wpa_supplicant's socket: root only again. Wi-Fi restarts in a"
+        echo "few seconds ($WPA_UNIT); the connection drops briefly."
         sudo systemd-run --quiet --on-active=8 \
             /bin/systemctl restart "$WPA_UNIT"
     fi

@@ -46,6 +46,14 @@ sudo systemctl disable --now "$UNIT" 2>/dev/null || true
 sudo rm -f /etc/systemd/system/$UNIT
 sudo systemctl daemon-reload
 
+GATE_UNIT=plus4-wifi-gate.service
+echo "Removing $GATE_UNIT"
+sudo systemctl disable --now "$GATE_UNIT" 2>/dev/null || true
+sudo rm -f "/etc/systemd/system/$GATE_UNIT"
+sudo rm -rf /usr/local/lib/plus4screen
+sudo systemctl daemon-reload
+
+# An earlier version let group netdev use wpa_supplicant's socket.
 WPA_CONF=/etc/wpa_supplicant/wpa_supplicant-wlan0.conf
 if sudo grep -q '^ctrl_interface_group=netdev$' "$WPA_CONF" 2>/dev/null; then
     echo "Wi-Fi control: back to root only (Wi-Fi restarts in a few seconds)"

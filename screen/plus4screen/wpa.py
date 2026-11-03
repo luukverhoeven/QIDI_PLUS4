@@ -1,9 +1,10 @@
-"""Wi-Fi through wpa_supplicant's control socket, as QIDI's xindi does it.
+"""Wi-Fi through wpa_supplicant's control protocol, as QIDI's xindi does it.
 
 The Plus4 runs ``wpa_supplicant -c /etc/wpa_supplicant/wpa_supplicant-wlan0
-.conf -i wlan0`` with its control socket in /var/run/wpa_supplicant. The
-socket belongs to the group in ``ctrl_interface_group``; install.sh sets it
-to ``netdev`` (mks is a member) so plus4screen can scan and connect.
+.conf -i wlan0`` with a control socket only root may use: it also takes
+commands that make wpa_supplicant load a library as root. plus4screen talks
+to plus4-wifi-gate instead (see wifi_gate.py), which passes on only the
+commands used here.
 
 Passwords are only sent to wpa_supplicant, never logged.
 """
@@ -13,7 +14,9 @@ import os
 import socket
 import tempfile
 
-CTRL = "/var/run/wpa_supplicant/wlan0"
+CTRL = "/run/plus4-wifi/wlan0"       # plus4-wifi-gate
+GATE_REFUSED = "FAIL-GATE-REFUSED"
+GATE_NO_WIFI = "FAIL-GATE-NO-WIFI"
 STRONG = -55             # dBm
 GOOD = -70
 
@@ -55,19 +58,22 @@ class Wpa:
             sock.settimeout(self.timeout)
             sock.connect(self.path)
             sock.send(command.encode("utf-8"))
-            return sock.recv(16384).decode("utf-8", "replace")
-        except PermissionError:
+            reply = sock.recv(16384).decode("utf-8", "replace")
+        except (PermissionError, FileNotFoundError, ConnectionRefusedError):
             raise WpaError("No access to Wi-Fi control. Run install.sh "
-                           "again to allow it.") from None
-        except FileNotFoundError:
-            raise WpaError("Wi-Fi is not running (wpa_supplicant).") \
-                from None
+                           "again to set it up.") from None
         except OSError as exc:
             raise WpaError("Wi-Fi control: %s" % exc) from None
         finally:
             sock.close()
             if os.path.exists(local):
                 os.unlink(local)
+        if reply.startswith(GATE_NO_WIFI):
+            raise WpaError("Wi-Fi is not running (wpa_supplicant).")
+        if reply.startswith(GATE_REFUSED):
+            raise WpaError("Wi-Fi control refused %s."
+                           % (command.split(" ", 1)[0] or "the request"))
+        return reply
 
     def ok(self, command):
         reply = self.request(command).strip()

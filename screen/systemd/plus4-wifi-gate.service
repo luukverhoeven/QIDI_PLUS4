@@ -1,0 +1,27 @@
+[Unit]
+Description=Wi-Fi allowlist for plus4screen (passes the Wi-Fi screen's commands to wpa_supplicant)
+After=makerbase-wlan0.service
+
+[Service]
+Type=simple
+# A copy only root can change; -I ignores the environment and user site.
+ExecStart=/usr/bin/python3 -I /usr/local/lib/plus4screen/wifi_gate.py
+Restart=always
+RestartSec=3
+RuntimeDirectory=plus4-wifi
+RuntimeDirectoryMode=0755
+UMask=0077
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_UNIX
+# CAP_CHOWN: give the gate socket to group netdev. CAP_DAC_OVERRIDE: answer
+# plus4screen's socket in /tmp, which belongs to mks.
+CapabilityBoundingSet=CAP_CHOWN CAP_DAC_OVERRIDE
+
+[Install]
+WantedBy=multi-user.target
