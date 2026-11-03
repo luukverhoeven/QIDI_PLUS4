@@ -19,9 +19,8 @@ ProtectKernelTunables=yes
 ProtectKernelModules=yes
 ProtectControlGroups=yes
 RestrictAddressFamilies=AF_UNIX
-# CAP_CHOWN: give the gate socket to group netdev. CAP_DAC_OVERRIDE: answer
-# plus4screen's socket in /tmp, which belongs to mks.
-CapabilityBoundingSet=CAP_CHOWN CAP_DAC_OVERRIDE
+# Only to give the gate socket to group netdev.
+CapabilityBoundingSet=CAP_CHOWN
 
 [Install]
 WantedBy=multi-user.target

@@ -10,9 +10,7 @@ Passwords are only sent to wpa_supplicant, never logged.
 """
 
 import codecs
-import os
 import socket
-import tempfile
 
 CTRL = "/run/plus4-wifi/wlan0"       # plus4-wifi-gate
 GATE_REFUSED = "FAIL-GATE-REFUSED"
@@ -48,17 +46,20 @@ class Wpa:
         self.timeout = timeout
 
     def request(self, command):
-        local = os.path.join(tempfile.gettempdir(),
-                             "plus4screen-wpa-%d" % os.getpid())
-        sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+        """Send one command to plus4-wifi-gate and return the reply."""
+        sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         try:
-            if os.path.exists(local):
-                os.unlink(local)
-            sock.bind(local)
             sock.settimeout(self.timeout)
             sock.connect(self.path)
-            sock.send(command.encode("utf-8"))
-            reply = sock.recv(16384).decode("utf-8", "replace")
+            sock.sendall(command.encode("utf-8"))
+            sock.shutdown(socket.SHUT_WR)
+            chunks = []
+            while True:
+                chunk = sock.recv(16384)
+                if not chunk:
+                    break
+                chunks.append(chunk)
+            reply = b"".join(chunks).decode("utf-8", "replace")
         except (PermissionError, FileNotFoundError, ConnectionRefusedError):
             raise WpaError("No access to Wi-Fi control. Run install.sh "
                            "again to set it up.") from None
@@ -66,8 +67,6 @@ class Wpa:
             raise WpaError("Wi-Fi control: %s" % exc) from None
         finally:
             sock.close()
-            if os.path.exists(local):
-                os.unlink(local)
         if reply.startswith(GATE_NO_WIFI):
             raise WpaError("Wi-Fi is not running (wpa_supplicant).")
         if reply.startswith(GATE_REFUSED):

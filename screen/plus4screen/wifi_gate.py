@@ -23,6 +23,7 @@ WPA = "/var/run/wpa_supplicant/wlan0"
 GATE = "/run/plus4-wifi/wlan0"
 GROUP = "netdev"             # may use the gate; mks is a member
 TIMEOUT = 4.0                # s to wait for wpa_supplicant
+CLIENT_TIMEOUT = 2.0         # s a client may take to send its request
 MAX_REQUEST = 256            # bytes
 REFUSED = "FAIL-GATE-REFUSED"
 NO_WIFI = "FAIL-GATE-NO-WIFI"
@@ -85,32 +86,49 @@ def answer(data, forward=forward):
     return forward(command)
 
 
+def read_request(conn):
+    """Up to MAX_REQUEST + 1 bytes, until the client shuts its side."""
+    data = b""
+    while len(data) <= MAX_REQUEST:
+        chunk = conn.recv(MAX_REQUEST + 1 - len(data))
+        if not chunk:
+            break
+        data += chunk
+    return data
+
+
 def serve(gate=GATE, group=GROUP, wpa=WPA, count=None, ready=None):
-    """Answer requests on the ``gate`` socket; ``count`` ends the loop
-    after that many requests (tests)."""
+    """Answer requests on the ``gate`` socket, one per connection.
+
+    The client sends a command and shuts its side; the reply goes back on
+    the same connection, so root never sends anything to a path a client
+    chose. ``count`` ends the loop after that many connections (tests).
+    """
     os.umask(0o077)
     if os.path.exists(gate):
         os.unlink(gate)
-    sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     sock.bind(gate)
     if group is not None:
         os.chown(gate, 0, grp.getgrnam(group).gr_gid)
     os.chmod(gate, 0o660 if group is not None else 0o600)
+    sock.listen(4)
     if ready is not None:
         ready.set()
     local_dir = os.path.dirname(gate)
     try:
         while count is None or count > 0:
-            data, client = sock.recvfrom(4096)
+            conn, _ = sock.accept()
             if count is not None:
                 count -= 1
-            if not client:
-                continue             # an unbound client cannot get a reply
-            reply = answer(data, lambda c: forward(c, wpa, local_dir))
-            try:
-                sock.sendto(reply, client)
-            except OSError as exc:
-                log.warning("reply not sent: %s", exc)
+            with conn:
+                try:
+                    conn.settimeout(CLIENT_TIMEOUT)
+                    reply = answer(read_request(conn),
+                                   lambda c: forward(c, wpa, local_dir))
+                    conn.sendall(reply)
+                except OSError as exc:
+                    log.warning("request failed: %s", exc)
     finally:
         sock.close()
 
