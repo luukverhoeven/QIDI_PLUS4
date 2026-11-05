@@ -16,6 +16,9 @@ EXTRUDE_MM = 10
 EXTRUDE_FEED = 300
 MIN_EXTRUDE_TEMP = 170
 MATERIALS = {"mat_pla": 220, "mat_petg": 250, "mat_abs": 260, "mat_pa": 300}
+# Filament type a load sets on the spool, so QIDI Studio can map the slicer's
+# filament to it. The printer's filament list has no plain PA type.
+MATERIAL_TYPES = {"mat_pla": "PLA", "mat_petg": "PETG", "mat_abs": "ABS"}
 FAN_NAMES = ("cooling_fan", "auxiliary_cooling_fan", "chamber_circulation_fan")
 FAN_STEP = 10
 PRESETS = {"pre_pla": (220, 60), "pre_petg": (250, 70),
@@ -201,7 +204,10 @@ class Filament(Screen):
             job.error = str(error) if error is not None else None
             if app.current == self.name:
                 self.refresh(app.state)
-        app.gcode("%s TEMP=%d" % (macro, job.temp), done)
+        command = "%s TEMP=%d" % (macro, job.temp)
+        if kind == "load" and self.material in MATERIAL_TYPES:
+            command += " TYPE=%s" % MATERIAL_TYPES[self.material]
+        app.gcode(command, done)
         if app.current == self.name:
             self.refresh(app.state)
 

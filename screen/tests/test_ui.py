@@ -219,7 +219,25 @@ class UITest(unittest.TestCase):
         self.app.show("filament")
         self.tap("mat_pla")
         self.tap("load")
-        self.assertEqual(self.mr.scripts, ["LOAD_FILAMENT TEMP=220"])
+        self.assertEqual(self.mr.scripts, ["LOAD_FILAMENT TEMP=220 TYPE=PLA"])
+
+    def test_filament_load_sets_the_type_for_the_slicer(self):
+        self.app.show("filament")
+        self.tap("mat_abs")
+        self.tap("load")
+        self.assertEqual(self.mr.scripts, ["LOAD_FILAMENT TEMP=260 TYPE=ABS"])
+
+    def test_filament_load_without_a_known_type_keeps_the_spool_type(self):
+        self.app.show("filament")
+        self.tap("mat_pa")
+        self.tap("load")
+        self.assertEqual(self.mr.scripts, ["LOAD_FILAMENT TEMP=300"])
+
+    def test_filament_unload_sends_no_type(self):
+        self.app.show("filament")
+        self.tap("mat_abs")
+        self.tap("unload")
+        self.assertEqual(self.mr.scripts, ["UNLOAD_FILAMENT TEMP=260"])
 
     def test_files_split_local_and_usb(self):
         self.app.show("files")
