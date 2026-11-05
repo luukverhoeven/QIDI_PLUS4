@@ -44,6 +44,7 @@ What `screen/install.sh` and a few manual steps changed outside this repository:
     - PC and PVA are left out: the printer has no entry for them and would report PLA.
     - Without `TEMP`, the type picks its own load temperature. Without `TYPE`, the spool's filament stays as it was.
   - Both refuse to run while printing. Pause the print first.
+  - Calls with `T=` do nothing except log a message. QIDI Studio's Plus4 end G-code runs `UNLOAD_FILAMENT T=…` for the QIDI Box. On stock firmware without a Box that command does not exist and is skipped; here it must not cut the filament or end the print in an error.
 
 To switch Box logic off on a running printer without copying files, run `SAVE_VARIABLE VARIABLE=enable_box VALUE=0` from the Fluidd console. Use `VALUE=1` to switch it back on.
 
