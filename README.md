@@ -38,7 +38,11 @@ What `screen/install.sh` and a few manual steps changed outside this repository:
   - `auto_reload_detect = 0`: on runout the printer pauses instead of calling `AUTO_RELOAD_FILAMENT`, a Box macro that is not defined without the Box config.
 - `config/gcode_macro.cfg`: `LOAD_FILAMENT` and `UNLOAD_FILAMENT` macros. They call the stock `M604` (load) and `M603` (cut, then purge what is left in the nozzle; pull the spool back afterwards), without the Box or filament-sensor checks of the touchscreen. Fluidd shows them as buttons on the Macros card.
   - `TEMP` (default `250`, same as stock) must be within the extruder's `min_extrude_temp` and `max_temp`.
-  - `LOAD_FILAMENT TYPE=…` (`PLA`, `PETG`, `ABS`, `ASA`, `PC`, `TPU` or `PVA`) also sets the external spool's filament once the load is done (`filament_slot16`). QIDI Studio only maps a slicer filament to a spool of the same type, so this stops the "Not all filaments used in slicing are mapped to the printer" error. Without `TEMP`, the type picks its own load temperature. Without `TYPE`, the spool's filament stays as it was.
+  - `LOAD_FILAMENT TYPE=…` (`PLA`, `PETG`, `ABS`, `ASA` or `TPU`) also sets the external spool's filament once the load is done (`filament_slot16`). This stops QIDI Studio's "Not all filaments used in slicing are mapped to the printer" error.
+    - QIDI Studio only maps a slicer filament to a spool with the same type and the same nozzle temperature range.
+    - Each type therefore sets a filament whose range in the printer's `filament-0.4.json` equals QIDI Studio's Generic profile (QIDI ASA for ASA): PLA Basic, PETG Tough, ABS Rapido, ASA and TPU 95A-HF.
+    - PC and PVA are left out: the printer has no entry for them and would report PLA.
+    - Without `TEMP`, the type picks its own load temperature. Without `TYPE`, the spool's filament stays as it was.
   - Both refuse to run while printing. Pause the print first.
 
 To switch Box logic off on a running printer without copying files, run `SAVE_VARIABLE VARIABLE=enable_box VALUE=0` from the Fluidd console. Use `VALUE=1` to switch it back on.
